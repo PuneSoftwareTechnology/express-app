@@ -1,9 +1,8 @@
 import express from "express";
 import cors from "cors";
 import dotenv from "dotenv";
-
-// import blogRoutes from './routes/blogRoutes.js';
-// import testimonialRoutes from './routes/testimonialRoutes.js';
+import demoRequestRoutes from "./routes/demoRequests.js";
+import { connectToDatabase } from "./database/dbConnection.js";
 
 // Load environment variables
 dotenv.config();
@@ -11,14 +10,15 @@ dotenv.config();
 const app = express();
 const PORT = process.env.PORT || 8080;
 
+await connectToDatabase();
+
 // Middleware
 app.use(cors());
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
-// // Routes
-// app.use('/blogs', blogRoutes);
-// app.use('/testimonials', testimonialRoutes);
+// Register routes
+app.use("/demo", demoRequestRoutes);
 
 // Root Route
 app.get("/", (req, res) => {
