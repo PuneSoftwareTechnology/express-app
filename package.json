@@ -1,0 +1,26 @@
+{
+  "name": "express-app",
+  "version": "1.0.0",
+  "description": "backend to pune-software-technologies",
+  "main": "index.js",
+  "type": "module",
+  "scripts": {
+    "start":"node --watch index.js",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/PuneSoftwareTech/PST-express-app.git"
+  },
+  "author": "saurabh-soni",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/PuneSoftwareTech/PST-express-app/issues"
+  },
+  "homepage": "https://github.com/PuneSoftwareTech/PST-express-app#readme",
+  "dependencies": {
+    "cors": "^2.8.5",
+    "dotenv": "^16.4.7",
+    "express": "^4.21.2"
+  }
+}
