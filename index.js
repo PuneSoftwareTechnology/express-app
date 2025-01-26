@@ -1,8 +1,9 @@
 import express from "express";
 import cors from "cors";
 import dotenv from "dotenv";
-import demoRequestRoutes from "./routes/demoRequests.js";
+import demoRequestRoutes from "./routes/demo.routes.js";
 import { connectToDatabase } from "./database/dbConnection.js";
+import adminRouter from "./routes/admin.routes.js";
 
 // Load environment variables
 dotenv.config();
@@ -19,6 +20,7 @@ app.use(express.urlencoded({ extended: true }));
 
 // Register routes
 app.use("/demo", demoRequestRoutes);
+app.use("/admin", adminRouter);
 
 // Root Route
 app.get("/", (req, res) => {

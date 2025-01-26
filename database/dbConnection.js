@@ -101,10 +101,15 @@ export async function updateSql(table, data, whereClause, whereParams = []) {
   }
 }
 
-// export default {
-//     connectToDatabase,
-//     insert,
-//     executeRawQuery,
-//     bulkInsert,
-//     updateSql,
-// };
+// Find all records
+export async function findAll(table, whereClause, whereParams = []) {
+  try {
+    const connection = await connectToDatabase();
+    const query = `SELECT * FROM \`${table}\` WHERE ${whereClause}`;
+    const [rows] = await connection.execute(query, whereParams);
+    return rows.length > 0 ? rows : []; // Return all matching rows
+  } catch (error) {
+    console.error("Error during find all:", error.message);
+    throw error;
+  }
+}

@@ -36,7 +36,6 @@ export const processDemoRequest = async ({ name, email, phone, message }) => {
       data: {
         success: true,
         message: "Demo request processed successfully!",
-        data: sanitizedData,
       },
     };
   } catch (error) {
