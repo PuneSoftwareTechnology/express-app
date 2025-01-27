@@ -1,4 +1,4 @@
-import { insert } from "../database/dbConnection.js";
+import { executeRawQuery, insert } from "../database/dbConnection.js";
 
 export const processDemoRequest = async ({ name, email, phone, message }) => {
   try {
@@ -41,6 +41,31 @@ export const processDemoRequest = async ({ name, email, phone, message }) => {
   } catch (error) {
     // Log the error for debugging purposes
     console.error("Error in processDemoRequest:", error);
+
+    // Return a consistent error response
+    return {
+      status: 500,
+      data: {
+        error: "An internal server error occurred. Please try again later.",
+      },
+    };
+  }
+};
+
+export const getAllresponses = async () => {
+  try {
+    const reposne = await executeRawQuery("select * from demo_responses");
+    return {
+      status: 200,
+      data: {
+        success: true,
+        message: "Demo responses fetched successfully!",
+        data: reposne,
+      },
+    };
+  } catch (error) {
+    // Log the error for debugging purposes
+    console.error("Error in fetching data:", error);
 
     // Return a consistent error response
     return {

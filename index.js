@@ -1,9 +1,9 @@
 import express from "express";
 import cors from "cors";
 import dotenv from "dotenv";
-import demoRequestRoutes from "./routes/demo.routes.js";
-import { connectToDatabase } from "./database/dbConnection.js";
-import adminRouter from "./routes/admin.routes.js";
+import demoRequestRoutes from "./src/routes/demo.routes.js";
+import adminRouter from "./src/routes/admin.routes.js";
+import { connectToDatabase } from "./src/database/dbConnection.js";
 
 // Load environment variables
 dotenv.config();
