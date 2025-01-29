@@ -8,7 +8,7 @@ import { authenticate } from "../middlewares/auth.middleware.js";
 
 const adminRouter = Router();
 
-adminRouter.post("/create-user", createAdminUser);
+adminRouter.post("/create-user", authenticate, createAdminUser);
 adminRouter.post("/login", loginAdminUser);
 adminRouter.get("/all-users", authenticate, getAllUsersController);
 
