@@ -1,99 +1,82 @@
 import bcrypt from "bcrypt";
 import jwt from "jsonwebtoken";
 import { findAll, insert } from "../database/dbConnection.js";
+import { checkMissingFields, sendError } from "../utils/helperFunctions.js";
 
 const JWT_SECRET = process.env.JWT_SECRET;
+const validRoles = ["ADMIN", "SUPER_ADMIN"];
 
-export const createAdminUserService = async ({ username, password }) => {
+export const createAdminUserService = async (fields) => {
   try {
-    if (!username || !password) {
-      return {
-        status: 400,
-        data: {
-          success: false,
-          message: "Username and password are required.",
-        },
-      };
-    }
+    const { username, password, email, role, name } = fields;
+    const missingFieldsError = checkMissingFields(fields, [
+      "username",
+      "password",
+      "email",
+      "role",
+      "name",
+    ]);
+    if (missingFieldsError) return missingFieldsError;
 
-    const saltRounds = 10;
-    const encryptedPassword = await bcrypt.hash(password, saltRounds);
+    if (!/^[a-zA-Z0-9._%+-]+@punesoftwaretechnologies\.com$/.test(email))
+      return sendError(400, "Invalid email format.");
 
-    const newUser = {
+    if (!validRoles.includes(role))
+      return sendError(400, `Invalid role. Allowed: ${validRoles.join(", ")}`);
+
+    const existingUsers = await findAll(
+      "admin_users",
+      "username = ? OR email = ?",
+      [username, email]
+    );
+    if (existingUsers.length > 0)
+      return sendError(
+        400,
+        "User with the same username or email already exists."
+      );
+
+    const encryptedPassword = await bcrypt.hash(password, 10);
+    await insert("admin_users", {
       username,
       password: encryptedPassword,
-    };
-    await insert("admin_users", newUser);
+      email,
+      role,
+    });
 
     return {
       status: 200,
-      data: {
-        success: true,
-        message: "User has been created successfully.",
-        user: {
-          id: newUser.id,
-          username: newUser.username,
-        },
-      },
+      data: { success: true, message: "User created successfully." },
     };
   } catch (error) {
-    console.error("Error in createAdminUser:", error);
-    return {
-      status: 500,
-      data: {
-        success: false,
-        error: "An internal server error occurred. Please try again later.",
-      },
-    };
+    console.error("Error in createAdminUserService:", error);
+    return sendError(500, "Internal server error.");
   }
 };
 
 // Login Admin User Service
 export const loginAdminUserService = async ({ username, password }) => {
   try {
-    if (!username || !password) {
-      return {
-        status: 400,
-        data: {
-          success: false,
-          message: "Username and password are required.",
-        },
-      };
-    }
+    if (!username || !password)
+      return sendError(400, "Username and password are required.");
 
-    // Fetch user from the database
     const users = await findAll("admin_users", "username = ?", [username]);
-
-    if (!users || users.length === 0) {
-      return {
-        status: 401,
-        data: {
-          success: false,
-          message: "Invalid username or password.",
-        },
-      };
-    }
+    if (
+      users.length === 0 ||
+      !(await bcrypt.compare(password, users[0].password))
+    )
+      return sendError(401, "Invalid username or password.");
 
     const user = users[0];
-
-    // Compare the provided password with the stored hashed password
-    const isPasswordValid = await bcrypt.compare(password, user.password);
-
-    if (!isPasswordValid) {
-      return {
-        status: 401,
-        data: {
-          success: false,
-          message: "Invalid username or password.",
-        },
-      };
-    }
-
-    // Generate JWT token with 1-month expiry
     const token = jwt.sign(
-      { id: user.id, username: user.username },
+      {
+        id: user.id,
+        username: user.username,
+        email: user.email,
+        role: user.role,
+        name: user.name,
+      },
       JWT_SECRET,
-      { expiresIn: "30d" } // Set expiry to 30 days (1 month)
+      { expiresIn: "30d" }
     );
 
     return {
@@ -101,21 +84,38 @@ export const loginAdminUserService = async ({ username, password }) => {
       data: {
         success: true,
         message: "Login successful.",
-        user: {
+        data: {
           id: user.id,
           username: user.username,
+          email: user.email,
+          role: user.role,
+          name: user.name,
         },
-        token, // Include the token in the response
+        token,
       },
     };
   } catch (error) {
-    console.error("Error in loginAdminUser:", error);
+    console.error("Error in loginAdminUserService:", error);
+    return sendError(500, "Internal server error.");
+  }
+};
+
+// Get All Users Service
+export const getAllUsersService = async () => {
+  try {
+    const users = await findAll("admin_users", "deleted = ?", [false]);
+    if (users.length === 0) return sendError(404, "No active users found.");
+
     return {
-      status: 500,
+      status: 200,
       data: {
-        success: false,
-        error: "An internal server error occurred. Please try again later.",
+        success: true,
+        message: "Users fetched successfully.",
+        data: users.map(({ password, ...userData }) => userData),
       },
     };
+  } catch (error) {
+    console.error("Error in getAllUsersService:", error);
+    return sendError(500, "Internal server error.");
   }
 };

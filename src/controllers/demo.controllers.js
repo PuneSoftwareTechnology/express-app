@@ -2,29 +2,10 @@ import {
   getAllresponses,
   processDemoRequest,
 } from "../Services/demo.services.js";
+import { handleResponse } from "../utils/helperFunctions.js";
 
-export const handleDemoRequest = async (req, res) => {
-  try {
-    const result = await processDemoRequest(req.body);
+export const handleDemoRequest = (req, res) =>
+  handleResponse(processDemoRequest, req, res);
 
-    res.status(result.status).json(result.data);
-  } catch (error) {
-    console.error("Error in handleDemoRequest:", error);
-    res.status(500).json({
-      error: "An unexpected error occurred. Please try again later.",
-    });
-  }
-};
-
-export const getDemos = async (req, res) => {
-  try {
-    const result = await getAllresponses(req.body);
-
-    res.status(result.status).json(result.data);
-  } catch (error) {
-    console.error("Error in fetching demos:", error);
-    res.status(500).json({
-      error: "An unexpected error occurred. Please try again later.",
-    });
-  }
-};
+// Get Demos
+export const getDemos = (req, res) => handleResponse(getAllresponses, req, res);
