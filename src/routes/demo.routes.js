@@ -7,7 +7,7 @@ import { authenticate } from "../middlewares/auth.middleware.js";
 
 const router = Router();
 
-router.post("/request", authenticate, handleDemoRequest);
+router.post("/request", handleDemoRequest);
 router.get("/responses", authenticate, getDemos);
 
 export default router;

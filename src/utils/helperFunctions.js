@@ -19,7 +19,24 @@ export const checkMissingFields = (fields, requiredFields) => {
 
 export const handleResponse = async (service, req, res) => {
   try {
-    const result = await service(req.body);
+    let result;
+    let requestData;
+    if (req.method === "GET") {
+      requestData = req.query;
+      if (isEmptyObject(requestData)) {
+        requestData = null;
+      }
+      result = await service(requestData);
+    } else if (req.method === "POST" || req.method === "PATCH") {
+      requestData = req.body;
+      if (isEmptyObject(requestData)) {
+        requestData = null;
+      }
+      result = await service(requestData);
+    } else {
+      return res.status(405).json({ error: "Method Not Allowed" });
+    }
+
     res.status(result.status).json(result.data);
   } catch (error) {
     console.error(`Error: ${error.message}`);
@@ -27,4 +44,8 @@ export const handleResponse = async (service, req, res) => {
       error: "An unexpected error occurred. Please try again later.",
     });
   }
+};
+
+const isEmptyObject = (obj) => {
+  return obj && Object.keys(obj).length === 0 && obj.constructor === Object;
 };
