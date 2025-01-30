@@ -1,6 +1,6 @@
 import bcrypt from "bcrypt";
 import jwt from "jsonwebtoken";
-import { findAll, insert } from "../database/dbConnection.js";
+import { findAll, insert, updateSql } from "../database/dbConnection.js";
 import { checkMissingFields, sendError } from "../utils/helperFunctions.js";
 
 const JWT_SECRET = process.env.JWT_SECRET;
@@ -60,13 +60,20 @@ export const loginAdminUserService = async ({ username, password }) => {
       return sendError(400, "Username and password are required.");
 
     const users = await findAll("admin_users", "username = ?", [username]);
-    if (
-      users.length === 0 ||
-      !(await bcrypt.compare(password, users[0].password))
-    )
-      return sendError(401, "Invalid username or password.");
+    if (users.length === 0) return sendError(404, "User not found.");
 
     const user = users[0];
+
+    // Check if the user is deleted (you can adjust this condition based on your database schema)
+    if (user?.deleted) {
+      return sendError(404, "User not found.");
+    }
+
+    // Validate the password
+    if (!(await bcrypt.compare(password, user.password))) {
+      return sendError(401, "Invalid username or password.");
+    }
+
     const token = jwt.sign(
       {
         id: user.id,
@@ -116,6 +123,28 @@ export const getAllUsersService = async () => {
     };
   } catch (error) {
     console.error("Error in getAllUsersService:", error);
+    return sendError(500, "Internal server error.");
+  }
+};
+
+export const deleteUserService = async ({ email }) => {
+  try {
+    const user = await findAll("admin_users", "email = ?", [email]);
+    if (user.length === 0) {
+      return sendError(404, "User not found.");
+    }
+
+    await updateSql("admin_users", { deleted: 1 }, "email = ?", [email]);
+
+    return {
+      status: 200,
+      data: {
+        success: true,
+        message: "User marked as deleted successfully.",
+      },
+    };
+  } catch (error) {
+    console.error("Error in deleteUserService:", error);
     return sendError(500, "Internal server error.");
   }
 };

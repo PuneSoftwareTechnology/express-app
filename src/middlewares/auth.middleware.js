@@ -1,6 +1,7 @@
 import jwt from "jsonwebtoken";
+import { findAll } from "../database/dbConnection.js";
 
-export const authenticate = (req, res, next) => {
+export const authenticate = async (req, res, next) => {
   const authHeader = req.headers["authorization"];
 
   // Check if the Authorization header is provided
@@ -21,9 +22,18 @@ export const authenticate = (req, res, next) => {
 
   try {
     const decoded = jwt.verify(token, process.env.JWT_SECRET); // Verify the token with the secret key
+
+    // Check if the user exists and if the user is deleted using email
+    const user = await findAll("admin_users", "email = ?", [decoded.email]);
+
+    if (user[0]?.deleted) {
+      return res.status(404).json({ message: "USER_NOT_FOUND" });
+    }
+
     req.user = decoded; // Attach user info to the request object
     next(); // Proceed to the next middleware or route handler
   } catch (error) {
+    console.error("Authentication error:", error);
     res.status(403).json({ message: "Invalid or Expired Token" });
   }
 };

@@ -1,5 +1,6 @@
 import {
   createAdminUserService,
+  deleteUserService,
   getAllUsersService,
   loginAdminUserService,
 } from "../Services/admin.services.js";
@@ -11,3 +12,6 @@ export const loginAdminUser = (req, res) =>
   handleResponse(loginAdminUserService, req, res);
 export const getAllUsersController = (req, res) =>
   handleResponse(getAllUsersService, req, res);
+
+export const deleteUserController = (req, res) =>
+  handleResponse(deleteUserService, req, res);

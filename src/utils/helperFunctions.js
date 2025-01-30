@@ -1,5 +1,5 @@
-export const sendError = (message) => ({
-  status: 500,
+export const sendError = (statusCode, message) => ({
+  status: statusCode,
   data: { error: message },
 });
 
