@@ -6,6 +6,7 @@ import adminRouter from "./src/routes/admin.routes.js";
 import testimonialRouter from "./src/routes/testimonial.route.js";
 import { connectToDatabase } from "./src/database/dbConnection.js";
 import faqRouter from "./src/routes/faq.route.js";
+import blogRouter from "./src/routes/blog.routes.js";
 
 // Load environment variables
 dotenv.config();
@@ -25,6 +26,7 @@ app.use("/demo", demoRequestRoutes);
 app.use("/admin", adminRouter);
 app.use("/testimonial", testimonialRouter);
 app.use("/faq", faqRouter);
+app.use("/blog", blogRouter);
 
 // Root Route
 app.get("/", (req, res) => {
