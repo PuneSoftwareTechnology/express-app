@@ -9,7 +9,12 @@ import { checkMissingFields, sendError } from "../utils/helperFunctions.js";
 export const createFAQService = async (fields) => {
   try {
     // Check for missing required fields
-    const requiredFields = ["question", "answer", "related_topic"];
+    const requiredFields = [
+      "question",
+      "answer",
+      "related_topic",
+      "user_email",
+    ];
     const missingFieldsError = checkMissingFields(fields, requiredFields);
     if (missingFieldsError) return missingFieldsError;
 

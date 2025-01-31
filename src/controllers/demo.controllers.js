@@ -1,6 +1,7 @@
 import {
   getAllresponses,
   processDemoRequest,
+  updateDemoService,
 } from "../Services/demo.services.js";
 import { handleResponse } from "../utils/helperFunctions.js";
 
@@ -9,3 +10,7 @@ export const handleDemoRequest = (req, res) =>
 
 // Get Demos
 export const getDemos = (req, res) => handleResponse(getAllresponses, req, res);
+
+export const updateDemoController = (req, res) => {
+  handleResponse(updateDemoService, req, res);
+};
