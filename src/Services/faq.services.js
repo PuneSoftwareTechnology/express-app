@@ -1,4 +1,9 @@
-import { executeRawQuery, insert } from "../database/dbConnection.js";
+import {
+  executeRawQuery,
+  findAll,
+  insert,
+  updateSql,
+} from "../database/dbConnection.js";
 import { checkMissingFields, sendError } from "../utils/helperFunctions.js";
 
 export const createFAQService = async (fields) => {
@@ -28,9 +33,9 @@ export const createFAQService = async (fields) => {
 
 export const getFAQsService = async (relatedTopic) => {
   try {
-    let query = "SELECT * FROM faqs";
+    let query = "SELECT * FROM faqs WHERE deleted = false";
     if (relatedTopic) {
-      query += ` WHERE related_topic ='${relatedTopic?.related_topic}' `;
+      query += ` AND related_topic ='${relatedTopic?.related_topic}' `;
     }
 
     const responses = await executeRawQuery(query);
@@ -48,5 +53,55 @@ export const getFAQsService = async (relatedTopic) => {
     return sendError(
       "An internal server error occurred. Please try again later."
     );
+  }
+};
+
+export const deleteFAQService = async ({ id }) => {
+  try {
+    const faq = await findAll("faqs", "id = ? AND deleted = false", [id]);
+
+    if (faq.length === 0) {
+      return sendError(404, "FAQ does not exist or has already been deleted.");
+    }
+    await updateSql("faqs", { deleted: true }, "id = ?", [id]);
+
+    return {
+      status: 200,
+      data: {
+        success: true,
+        message: "FAQ marked as deleted successfully.",
+      },
+    };
+  } catch (error) {
+    console.error("Error in deleteFAQService:", error);
+    return sendError(500, "Internal server error.");
+  }
+};
+
+export const updateFAQService = async (payload) => {
+  try {
+    const { id, ...data } = payload;
+
+    const faq = await findAll("faqs", "id = ?", [id]);
+    if (faq.length === 0) {
+      return sendError(404, "FAQ does not exist or has already been deleted.");
+    }
+
+    if (!data || Object.keys(data).length === 0) {
+      return sendError(400, "No fields to update.");
+    }
+
+    await updateSql("faqs", data, "id = ?", [id]);
+
+    return {
+      status: 200,
+      data: {
+        success: true,
+        message: "FAQ updated successfully.",
+      },
+    };
+  } catch (error) {
+    console.error("Error in updateFAQService:", error);
+    return sendError(500, "Internal server error.");
   }
 };
