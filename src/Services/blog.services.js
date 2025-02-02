@@ -36,7 +36,7 @@ export const createBlogService = async (fields) => {
 export const fetchBlogService = async () => {
   try {
     const blogs = await executeRawQuery(
-      "SELECT id,title,slug,created_at,author_id,status FROM blog_posts WHERE LOWER(status) != 'archived'"
+      "SELECT id,title,slug,created_at,author_id,status FROM blog_posts WHERE deleted =false"
     );
     return {
       status: 200,
