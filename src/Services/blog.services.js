@@ -8,16 +8,38 @@ import { checkMissingFields, sendError } from "../utils/helperFunctions.js";
 
 export const createBlogService = async (fields) => {
   try {
+    console.log(fields, "Payload received");
+
+    // Check for required fields
     const requiredFields = [
       "title",
       "slug",
-      "main_content",
       "author_id",
       "featured_image",
       "conclusion",
     ];
-    const missingFieldsError = checkMissingFields(fields, requiredFields);
-    if (missingFieldsError) return missingFieldsError;
+    const missingFields = requiredFields.filter((field) => !fields[field]);
+
+    if (missingFields.length > 0) {
+      return {
+        status: 400,
+        data: {
+          success: false,
+          message: `Missing required fields: ${missingFields.join(", ")}`,
+        },
+      };
+    }
+
+    // Convert the array to a JSON string
+    if (
+      fields.tertiary_content_points &&
+      Array.isArray(fields.tertiary_content_points)
+    ) {
+      fields.tertiary_content_points = JSON.stringify(
+        fields.tertiary_content_points
+      );
+    }
+
     await insert("blog_posts", fields);
 
     return {
@@ -26,9 +48,13 @@ export const createBlogService = async (fields) => {
     };
   } catch (error) {
     console.error("Error in createBlogService:", error);
-    return sendError(
-      "An internal server error occurred. Please try again later."
-    );
+    return {
+      status: 500,
+      data: {
+        success: false,
+        message: "An internal server error occurred. Please try again later.",
+      },
+    };
   }
 };
 
