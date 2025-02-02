@@ -148,3 +148,37 @@ export const deleteUserService = async ({ email }) => {
     return sendError(500, "Internal server error.");
   }
 };
+
+export const updateUserService = async (payload) => {
+  try {
+    const { email, password, ...data } = payload;
+
+    const user = await findAll("admin_users", "email = ?", [email]);
+    if (user.length === 0) {
+      return sendError(404, "User not found.");
+    }
+
+    if (!data || Object.keys(data).length === 0) {
+      return sendError(400, "No fields to update.");
+    }
+
+    if (password) {
+      const saltRounds = 10;
+      const hashedPassword = await bcrypt.hash(password, saltRounds);
+      data.password = hashedPassword;
+    }
+
+    await updateSql("admin_users", data, "email = ?", [email]);
+
+    return {
+      status: 200,
+      data: {
+        success: true,
+        message: "User updated successfully.",
+      },
+    };
+  } catch (error) {
+    console.error("Error in updateUserService:", error);
+    return sendError(500, "Internal server error.");
+  }
+};

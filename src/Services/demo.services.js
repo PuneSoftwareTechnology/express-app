@@ -87,3 +87,27 @@ export const updateDemoService = async (payload) => {
     );
   }
 };
+
+export const deleteDemoService = async ({ id }) => {
+  try {
+    const demo = await findAll("demo_responses", "id = ? AND deleted = false", [
+      id,
+    ]);
+
+    if (demo.length === 0) {
+      return sendError(404, "Demo does not exist or has already been deleted.");
+    }
+    await updateSql("demo_responses", { deleted: true }, "id = ?", [id]);
+
+    return {
+      status: 200,
+      data: {
+        success: true,
+        message: "Demo marked as deleted successfully.",
+      },
+    };
+  } catch (error) {
+    console.error("Error in deleteDemoService:", error);
+    return sendError(500, "Internal server error.");
+  }
+};
