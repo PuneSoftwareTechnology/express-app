@@ -8,8 +8,6 @@ import { checkMissingFields, sendError } from "../utils/helperFunctions.js";
 
 export const createBlogService = async (fields) => {
   try {
-    console.log(fields, "Payload received");
-
     // Check for required fields
     const requiredFields = [
       "title",
@@ -18,7 +16,7 @@ export const createBlogService = async (fields) => {
       "featured_image",
       "conclusion",
     ];
-    const missingFields = requiredFields.filter((field) => !fields[field]);
+    const missingFields = checkMissingFields(fields, requiredFields);
 
     if (missingFields.length > 0) {
       return {
@@ -84,7 +82,6 @@ export const updateBlogService = async (payload) => {
   try {
     const { id, ...data } = payload;
 
-    // Check if the blog post exists
     const blog = await findAll("blog_posts", "id = ?", [id]);
     if (blog.length === 0) {
       return sendError(
@@ -93,10 +90,20 @@ export const updateBlogService = async (payload) => {
       );
     }
 
-    // Ensure there is data to update
     if (!data || Object.keys(data).length === 0) {
       return sendError(400, "No fields to update.");
     }
+
+    if (
+      data.tertiary_content_points &&
+      Array.isArray(data.tertiary_content_points)
+    ) {
+      data.tertiary_content_points = JSON.stringify(
+        data.tertiary_content_points
+      );
+    }
+
+    // Update the blog post
     await updateSql("blog_posts", data, "id = ?", [id]);
 
     return {
@@ -114,6 +121,7 @@ export const updateBlogService = async (payload) => {
     );
   }
 };
+
 export const fetchOneBlogService = async ({ id }) => {
   try {
     // Fetch the blog post based on the id
@@ -130,6 +138,9 @@ export const fetchOneBlogService = async ({ id }) => {
         "Blog does not exist or has already been archived."
       );
     }
+
+    delete blog[0]?.created_at;
+    delete blog[0]?.updated_at;
 
     // If blog found, return the data successfully
     return {
