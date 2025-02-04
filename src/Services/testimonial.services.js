@@ -1,4 +1,4 @@
-import { executeRawQuery, insert } from "../database/dbConnection.js";
+import { executeRawQuery, findAll, insert } from "../database/dbConnection.js";
 import { checkMissingFields, sendError } from "../utils/helperFunctions.js";
 
 export const saveTestimonialService = async (fields) => {
@@ -27,24 +27,31 @@ export const saveTestimonialService = async (fields) => {
   }
 };
 
-// Service to fetch all testimonials
-export const getAllTestimonialsService = async () => {
+export const getAllTestimonialsService = async (course) => {
   try {
+    let query =
+      "select * from testimonials where deleted = false order by created_at desc";
+    if (course) {
+      query += " and course = ?";
+    }
     const testimonials = await executeRawQuery(
-      "SELECT * FROM testimonials WHERE deleted = false"
+      query,
+      course?.course ? [course.course] : []
     );
+
     return {
       status: 200,
       data: {
         success: true,
-        message: "Testimonials fetched successfully!",
+        message: "Testimonials fetched successfully.",
         data: testimonials,
       },
     };
   } catch (error) {
-    console.error("Error in fetching testimonials:", error);
+    console.error("Error in getting testimonials:", error);
     return sendError(
-      "An internal server error occurred. Please try again later."
+      500,
+      "An internal server error occurred while fetching the testimonials."
     );
   }
 };
