@@ -63,7 +63,7 @@ export const fetchBlogService = async (landing_page) => {
       "SELECT id,title,slug,created_at,author_id,status FROM blog_posts WHERE deleted =false";
     if (landing_page) {
       query =
-        "SELECT id, introduction, featured_image, title, slug, created_at, author_id, status FROM blog_posts WHERE deleted =false AND status = 'PUBLISHED' ORDER BY created_at DESC LIMIT 4";
+        "SELECT id, introduction, featured_image, title, slug, created_at, author_id FROM blog_posts WHERE deleted =false AND status = 'PUBLISHED' ORDER BY created_at DESC LIMIT 4";
     }
 
     const blogs = await executeRawQuery(query);
