@@ -57,11 +57,17 @@ export const createBlogService = async (fields) => {
 };
 
 // Get All Blog Posts Service
-export const fetchBlogService = async () => {
+export const fetchBlogService = async (landing_page) => {
   try {
-    const blogs = await executeRawQuery(
-      "SELECT id,title,slug,created_at,author_id,status FROM blog_posts WHERE deleted =false"
-    );
+    let query =
+      "SELECT id,title,slug,created_at,author_id,status FROM blog_posts WHERE deleted =false";
+    if (landing_page) {
+      query =
+        "SELECT id, introduction, featured_image, title, slug, created_at, author_id, status FROM blog_posts WHERE deleted =false AND status = 'PUBLISHED' ORDER BY created_at DESC LIMIT 4";
+    }
+
+    const blogs = await executeRawQuery(query);
+
     return {
       status: 200,
       data: {

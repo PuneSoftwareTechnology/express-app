@@ -10,7 +10,7 @@ import { authenticate } from "../middlewares/auth.middleware.js";
 const companiesRouter = Router();
 
 companiesRouter.post("/save", authenticate, saveCompanyController);
-companiesRouter.get("/all", authenticate, getAllCompaniesController);
+companiesRouter.get("/all", getAllCompaniesController);
 companiesRouter.patch("/edit", authenticate, editCompanyController);
 companiesRouter.patch("/delete", authenticate, deleteCompanyController);
 
