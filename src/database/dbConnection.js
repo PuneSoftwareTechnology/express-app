@@ -9,27 +9,29 @@ const dbConfig = {
   port: process.env.DB_PORT || 3306,
   database: process.env.DB_SCHEMA,
   password: process.env.DB_PASSWORD,
+  waitForConnections: true,
+  connectionLimit: 10,
+  queueLimit: 0,
 };
 
-let connection;
+const pool = mysql.createPool(dbConfig);
 
 export async function connectToDatabase() {
-  if (!connection) {
-    try {
-      connection = await mysql.createConnection(dbConfig);
-      console.log("Database connection established successfully");
-    } catch (error) {
-      console.error("Error connecting to the database:", error.message);
-      throw error;
-    }
+  try {
+    const connection = await pool.getConnection();
+    console.log("Database connection established successfully");
+    connection.release(); // Release the connection back to the pool
+  } catch (error) {
+    console.error("Error connecting to the database:", error.message);
+    throw error;
   }
-  return connection;
 }
 
 // Insert a single record
 export async function insert(table, data) {
+  let connection;
   try {
-    const connection = await connectToDatabase();
+    connection = await pool.getConnection();
     const [result] = await connection.execute(
       `INSERT INTO \`${table}\` (${Object.keys(data).join(
         ", "
@@ -42,18 +44,23 @@ export async function insert(table, data) {
   } catch (error) {
     console.error("Error inserting data:", error.message);
     throw error;
+  } finally {
+    if (connection) connection.release();
   }
 }
 
 // Execute a raw query
 export async function executeRawQuery(query, params = []) {
+  let connection;
   try {
-    const connection = await connectToDatabase();
+    connection = await pool.getConnection();
     const [rows] = await connection.execute(query, params);
     return rows;
   } catch (error) {
     console.error("Error executing raw query:", error.message);
     throw error;
+  } finally {
+    if (connection) connection.release();
   }
 }
 
@@ -63,8 +70,9 @@ export async function bulkInsert(table, data) {
     throw new Error("Data for bulk insert must be a non-empty array");
   }
 
+  let connection;
   try {
-    const connection = await connectToDatabase();
+    connection = await pool.getConnection();
     const keys = Object.keys(data[0]);
     const values = data.map((row) => keys.map((key) => row[key]));
     const placeholders = data
@@ -79,13 +87,16 @@ export async function bulkInsert(table, data) {
   } catch (error) {
     console.error("Error during bulk insert:", error.message);
     throw error;
+  } finally {
+    if (connection) connection.release();
   }
 }
 
 // Update SQL
 export async function updateSql(table, data, whereClause, whereParams = []) {
+  let connection;
   try {
-    const connection = await connectToDatabase();
+    connection = await pool.getConnection();
     const setClause = Object.keys(data)
       .map((key) => `\`${key}\` = ?`)
       .join(", ");
@@ -98,18 +109,23 @@ export async function updateSql(table, data, whereClause, whereParams = []) {
   } catch (error) {
     console.error("Error during update:", error.message);
     throw error;
+  } finally {
+    if (connection) connection.release();
   }
 }
 
 // Find all records
 export async function findAll(table, whereClause, whereParams = []) {
+  let connection;
   try {
-    const connection = await connectToDatabase();
+    connection = await pool.getConnection();
     const query = `SELECT * FROM \`${table}\` WHERE ${whereClause}`;
     const [rows] = await connection.execute(query, whereParams);
     return rows.length > 0 ? rows : []; // Return all matching rows
   } catch (error) {
     console.error("Error during find all:", error.message);
     throw error;
+  } finally {
+    if (connection) connection.release();
   }
 }
