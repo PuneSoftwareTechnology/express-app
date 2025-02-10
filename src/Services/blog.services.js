@@ -59,12 +59,20 @@ export const createBlogService = async (fields) => {
 // Get All Blog Posts Service
 export const fetchBlogService = async (landing_page) => {
   try {
-    let query =
-      "SELECT id,title,slug,created_at,author_id,status FROM blog_posts WHERE deleted =false";
-    if (landing_page) {
-      query =
-        "SELECT id, introduction, featured_image, title, slug, created_at, author_id FROM blog_posts WHERE deleted =false AND status = 'PUBLISHED' ORDER BY created_at DESC LIMIT 4";
-    }
+    const pageType = landing_page?.landing_page || ""; // Extract the actual string
+
+    let baseQuery =
+      "SELECT id, introduction, featured_image, title, slug, created_at, category,  author_id FROM blog_posts WHERE deleted = false";
+
+    const queryOptions = {
+      blog: " AND status = 'PUBLISHED' ORDER BY created_at DESC",
+      main: " AND status = 'PUBLISHED' ORDER BY created_at DESC LIMIT 4",
+    };
+
+    const query =
+      pageType in queryOptions
+        ? baseQuery + queryOptions[pageType]
+        : "SELECT id, title, slug, created_at, author_id,category, status FROM blog_posts WHERE deleted = false";
 
     const blogs = await executeRawQuery(query);
 
@@ -128,13 +136,13 @@ export const updateBlogService = async (payload) => {
   }
 };
 
-export const fetchOneBlogService = async ({ id }) => {
+export const fetchOneBlogService = async ({ slug }) => {
   try {
-    // Fetch the blog post based on the id
+    // Fetch the blog post based on the slug
     const blog = await findAll(
       "blog_posts",
-      "id = ? AND status != 'ARCHIVED'",
-      [id]
+      "slug = ? AND status != 'ARCHIVED'",
+      [slug]
     );
 
     if (blog.length === 0) {
