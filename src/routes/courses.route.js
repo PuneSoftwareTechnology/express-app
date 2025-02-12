@@ -8,6 +8,7 @@ import {
   createCourseSyllabusController,
   deleteCourseSyllabusController,
   updateCourseSyllabusController,
+  getCourseNamesController,
 } from "../controllers/courses.controller.js";
 import { authenticate } from "../middlewares/auth.middleware.js";
 
@@ -17,6 +18,7 @@ CourseRouter.post("/create", authenticate, createCourseController);
 CourseRouter.get("/all", getCoursesController);
 CourseRouter.patch("/delete", authenticate, deleteCourseController);
 CourseRouter.patch("/update", authenticate, updateCourseController);
+CourseRouter.get("/all-course-names", authenticate, getCourseNamesController);
 //syllabus
 CourseRouter.post(
   "/syllabus/create",

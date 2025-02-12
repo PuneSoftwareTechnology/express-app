@@ -7,6 +7,7 @@ import {
   getCourseSyllabusService,
   deleteCourseSyllabusService,
   updateCourseSyllabusService,
+  getCourseNamesService,
 } from "../Services/courses.services.js";
 import { handleResponse } from "../utils/helperFunctions.js";
 
@@ -33,3 +34,6 @@ export const deleteCourseSyllabusController = (req, res) =>
 
 export const updateCourseSyllabusController = (req, res) =>
   handleResponse(updateCourseSyllabusService, req, res);
+
+export const getCourseNamesController = (req, res) =>
+  handleResponse(getCourseNamesService, req, res);

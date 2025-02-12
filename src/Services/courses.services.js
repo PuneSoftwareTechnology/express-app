@@ -288,3 +288,30 @@ export const updateCourseSyllabusService = async (payload) => {
     return sendError(500, "Internal server error.");
   }
 };
+
+export const getCourseNamesService = async () => {
+  try {
+    const query = "SELECT id, name FROM courses WHERE deleted = false";
+    const responses = await executeRawQuery(query);
+
+    return {
+      status: 200,
+      data: {
+        success: true,
+        message: "Course names fetched successfully!",
+        data: [
+          {
+            id: 0,
+            name: "Select",
+          },
+          ...responses,
+        ],
+      },
+    };
+  } catch (error) {
+    console.error("Error in getCourseNamesService:", error);
+    return sendError(
+      "An internal server error occurred. Please try again later."
+    );
+  }
+};
