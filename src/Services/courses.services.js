@@ -8,6 +8,8 @@ import {
 import { checkMissingFields, sendError } from "../utils/helperFunctions.js";
 
 export const saveCourseService = async (payload) => {
+  console.log(payload);
+
   try {
     const requiredFields = [
       "name",
@@ -19,15 +21,17 @@ export const saveCourseService = async (payload) => {
       "module_heading",
       "modules",
       "prerequisite",
+      "related_courses",
+      "category",
     ];
     const missingFieldsError = checkMissingFields(payload, requiredFields);
     if (missingFieldsError) return missingFieldsError;
 
-    // Convert arrays to JSON strings
     const processedPayload = {
       ...payload,
-      modules: JSON.stringify(payload.modules || []), // Ensure it's always a string
-      prerequisite: JSON.stringify(payload.prerequisite || []), // Ensure it's always a string
+      modules: JSON.stringify(payload.modules || []),
+      prerequisite: JSON.stringify(payload.prerequisite || []),
+      related_courses: JSON.stringify(payload.related_courses || []),
     };
 
     await insert("courses", processedPayload);
@@ -118,6 +122,17 @@ export const updateCourseService = async (payload) => {
 
     if (!data || Object.keys(data).length === 0) {
       return sendError(400, "No fields to update.");
+    }
+
+    // Process fields similarly to saveCourseService
+    if (data.modules) {
+      data.modules = JSON.stringify(data.modules);
+    }
+    if (data.prerequisite) {
+      data.prerequisite = JSON.stringify(data.prerequisite);
+    }
+    if (data.related_courses) {
+      data.related_courses = JSON.stringify(data.related_courses);
     }
 
     await updateSql("courses", data, "id = ?", [id]);
