@@ -9,6 +9,9 @@ import faqRouter from "./src/routes/faq.route.js";
 import blogRouter from "./src/routes/blog.routes.js";
 import settingsRouter from "./src/routes/settings.route.js";
 import companiesRouter from "./src/routes/companies.routes.js";
+import ProjectRouter from "./src/routes/projects.route.js";
+import JobRouter from "./src/routes/jobs.route.js";
+import CourseRouter from "./src/routes/courses.route.js";
 
 // Load environment variables
 dotenv.config();
@@ -31,6 +34,9 @@ app.use("/faq", faqRouter);
 app.use("/blog", blogRouter);
 app.use("/settings", settingsRouter);
 app.use("/companies", companiesRouter);
+app.use("/projects", ProjectRouter);
+app.use("/jobs", JobRouter);
+app.use("/courses", CourseRouter);
 
 // Root Route
 app.get("/", (req, res) => {
