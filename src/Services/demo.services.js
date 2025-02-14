@@ -58,7 +58,7 @@ export const getAllresponses = async () => {
 export const updateDemoService = async (payload) => {
   try {
     const { id, ...data } = payload;
-    const demo = await findAll("demo_responses", "id = ?", [id]);
+    const demo = await findAll("demo_responses", "id  = $1", [id]);
     if (demo.length === 0) {
       return sendError(
         404,
@@ -70,7 +70,7 @@ export const updateDemoService = async (payload) => {
       return sendError(400, "No fields to update.");
     }
 
-    await updateSql("demo_responses", data, "id = ?", [id]);
+    await updateSql("demo_responses", data, "id  = $1", [id]);
 
     return {
       status: 200,
@@ -90,14 +90,14 @@ export const updateDemoService = async (payload) => {
 
 export const deleteDemoService = async ({ id }) => {
   try {
-    const demo = await findAll("demo_responses", "id = ? AND deleted = false", [
+    const demo = await findAll("demo_responses", "id  = $1 AND deleted = false", [
       id,
     ]);
 
     if (demo.length === 0) {
       return sendError(404, "Demo does not exist or has already been deleted.");
     }
-    await updateSql("demo_responses", { deleted: true }, "id = ?", [id]);
+    await updateSql("demo_responses", { deleted: true }, "id  = $1", [id]);
 
     return {
       status: 200,

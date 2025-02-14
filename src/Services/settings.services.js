@@ -74,7 +74,7 @@ export const deleteEmailsService = async (payload) => {
     const placeholders = emails.map(() => "?").join(", ");
     const existingEmails = await findAll(
       "email_notification",
-      `email IN (${placeholders}) AND user_email = ? AND deleted = ?`,
+      `email IN (${placeholders}) AND user_email  = $1 AND deleted  = $2`,
       [...emails, user_email, false]
     );
 
@@ -86,7 +86,7 @@ export const deleteEmailsService = async (payload) => {
     await updateSql(
       "email_notification",
       { deleted: true },
-      `email IN (${placeholders}) AND user_email = ?`,
+      `email IN (${placeholders}) AND user_email  = $1`,
       [...existingEmailAddresses, user_email]
     );
 

@@ -96,7 +96,7 @@ export const updateBlogService = async (payload) => {
   try {
     const { id, ...data } = payload;
 
-    const blog = await findAll("blog_posts", "id = ?", [id]);
+    const blog = await findAll("blog_posts", "id  = $1", [id]);
     if (blog.length === 0) {
       return sendError(
         404,
@@ -118,7 +118,7 @@ export const updateBlogService = async (payload) => {
     }
 
     // Update the blog post
-    await updateSql("blog_posts", data, "id = ?", [id]);
+    await updateSql("blog_posts", data, "id  = $1", [id]);
 
     return {
       status: 200,
@@ -141,7 +141,7 @@ export const fetchOneBlogService = async ({ slug }) => {
     // Fetch the blog post based on the slug
     const blog = await findAll(
       "blog_posts",
-      "slug = ? AND status != 'ARCHIVED'",
+      "slug  = $1 AND status != 'ARCHIVED'",
       [slug]
     );
 

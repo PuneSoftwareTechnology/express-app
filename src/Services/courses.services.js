@@ -55,7 +55,7 @@ export const getCoursesService = async (category) => {
   try {
     let query = "SELECT * FROM courses WHERE deleted = false";
     if (category) {
-      query += ` AND category = ?`;
+      query += ` AND category  = $1`;
     }
 
     const responses = await executeRawQuery(
@@ -81,7 +81,7 @@ export const getCoursesService = async (category) => {
 
 export const deleteCourseService = async ({ id }) => {
   try {
-    const course = await findAll("courses", "id = ? AND deleted = false", [id]);
+    const course = await findAll("courses", "id  = $1 AND deleted = false", [id]);
 
     if (course.length === 0) {
       return sendError(
@@ -89,7 +89,7 @@ export const deleteCourseService = async ({ id }) => {
         "Course does not exist or has already been deleted."
       );
     }
-    await updateSql("courses", { deleted: true }, "id = ?", [id]);
+    await updateSql("courses", { deleted: true }, "id  = $1", [id]);
 
     return {
       status: 200,
@@ -112,7 +112,7 @@ export const updateCourseService = async (payload) => {
       return sendError(400, "Course ID is required.");
     }
 
-    const course = await findAll("courses", "id = ?", [id]);
+    const course = await findAll("courses", "id  = $1", [id]);
     if (course.length === 0) {
       return sendError(
         404,
@@ -135,7 +135,7 @@ export const updateCourseService = async (payload) => {
       data.related_courses = JSON.stringify(data.related_courses);
     }
 
-    await updateSql("courses", data, "id = ?", [id]);
+    await updateSql("courses", data, "id  = $1", [id]);
 
     return {
       status: 200,
@@ -195,7 +195,7 @@ export const getCourseSyllabusService = async (course_id) => {
     const queryParams = [];
 
     if (course_id) {
-      query += " AND course_id = ?";
+      query += " AND course_id  = $1";
       queryParams.push(course_id);
     }
 
@@ -221,7 +221,7 @@ export const deleteCourseSyllabusService = async ({ course_id }) => {
   try {
     const syllabus = await findAll(
       "course_syllabus",
-      "course_id = ? AND deleted = false",
+      "course_id  = $1 AND deleted = false",
       [course_id]
     );
 
@@ -231,7 +231,7 @@ export const deleteCourseSyllabusService = async ({ course_id }) => {
         "Syllabus does not exist or has already been deleted."
       );
     }
-    await updateSql("course_syllabus", { deleted: true }, "course_id = ?", [
+    await updateSql("course_syllabus", { deleted: true }, "course_id  = $1", [
       course_id,
     ]);
 
@@ -256,7 +256,7 @@ export const updateCourseSyllabusService = async (payload) => {
       return sendError(400, "Syllabus ID is required.");
     }
 
-    const syllabus = await findAll("course_syllabus", "course_id = ?", [
+    const syllabus = await findAll("course_syllabus", "course_id  = $1", [
       course_id,
     ]);
     if (syllabus.length === 0) {
@@ -274,7 +274,7 @@ export const updateCourseSyllabusService = async (payload) => {
       data.lessons = JSON.stringify(data.lessons);
     }
 
-    await updateSql("course_syllabus", data, "course_id = ?", [course_id]);
+    await updateSql("course_syllabus", data, "course_id  = $1", [course_id]);
 
     return {
       status: 200,

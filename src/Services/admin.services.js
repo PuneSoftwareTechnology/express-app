@@ -18,17 +18,18 @@ export const createAdminUserService = async (fields) => {
     ]);
     if (missingFieldsError) return missingFieldsError;
 
-    if (!/^[a-zA-Z0-9._%+-]+@punesoftwaretechnologies\.com$/.test(email))
+    if (!/^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/.test(email))
       return sendError(400, "Invalid email format.");
 
     if (!validRoles.includes(role))
       return sendError(400, `Invalid role. Allowed: ${validRoles.join(", ")}`);
 
     const existingUsers = await findAll(
-      "admin_users",
-      "username = ? OR email = ?",
-      [username, email]
+      "users",
+      "username = $1 OR email = $2", // Use $1 and $2 for placeholders
+      [username, email] // Pass parameters in the correct order
     );
+
     if (existingUsers.length > 0)
       return sendError(
         400,
@@ -36,11 +37,12 @@ export const createAdminUserService = async (fields) => {
       );
 
     const encryptedPassword = await bcrypt.hash(password, 10);
-    await insert("admin_users", {
+    await insert("users", {
       username,
       password: encryptedPassword,
       email,
       role,
+      name,
     });
 
     return {
@@ -59,7 +61,7 @@ export const loginAdminUserService = async ({ username, password }) => {
     if (!username || !password)
       return sendError(400, "Username and password are required.");
 
-    const users = await findAll("admin_users", "username = ?", [username]);
+    const users = await findAll("users", "username = $1", [username]);
     if (users.length === 0) return sendError(404, "User not found.");
 
     const user = users[0];
@@ -110,7 +112,7 @@ export const loginAdminUserService = async ({ username, password }) => {
 // Get All Users Service
 export const getAllUsersService = async () => {
   try {
-    const users = await findAll("admin_users", "deleted = ?", [false]);
+    const users = await findAll("users", "deleted = $1", [false]);
     if (users.length === 0) return sendError(404, "No active users found.");
 
     return {
@@ -129,12 +131,12 @@ export const getAllUsersService = async () => {
 
 export const deleteUserService = async ({ email }) => {
   try {
-    const user = await findAll("admin_users", "email = ?", [email]);
+    const user = await findAll("users", "email = $1", [email]);
     if (user.length === 0) {
       return sendError(404, "User not found.");
     }
 
-    await updateSql("admin_users", { deleted: 1 }, "email = ?", [email]);
+    await updateSql("users", { deleted: 1 }, "email = $1", [email]);
 
     return {
       status: 200,
@@ -153,7 +155,7 @@ export const updateUserService = async (payload) => {
   try {
     const { email, password, ...data } = payload;
 
-    const user = await findAll("admin_users", "email = ?", [email]);
+    const user = await findAll("users", "email = $1", [email]);
     if (user.length === 0) {
       return sendError(404, "User not found.");
     }
@@ -168,7 +170,7 @@ export const updateUserService = async (payload) => {
       data.password = hashedPassword;
     }
 
-    await updateSql("admin_users", data, "email = ?", [email]);
+    await updateSql("users", data, "email = $1", [email]);
 
     return {
       status: 200,

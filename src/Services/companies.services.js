@@ -11,7 +11,7 @@ export const saveCompanyService = async (payload) => {
     // Check if the company already exists
     const existingCompanies = await findAll(
       "placement_companies",
-      "company_name = ? ",
+      "company_name  = $1 ",
       [payload.company_name]
     );
 
@@ -61,7 +61,7 @@ export const getAllCompaniesService = async () => {
 export const editCompanyService = async (payload) => {
   try {
     const { id, ...data } = payload;
-    const existingCompanies = await findAll("placement_companies", "id = ?", [
+    const existingCompanies = await findAll("placement_companies", "id  = $1", [
       id,
     ]);
 
@@ -92,7 +92,7 @@ export const editCompanyService = async (payload) => {
 
 export const deleteCompanyService = async ({ id }) => {
   try {
-    const existingCompanies = await findAll("placement_companies", "id = ?", [
+    const existingCompanies = await findAll("placement_companies", "id  = $1", [
       id,
     ]);
 
@@ -105,7 +105,7 @@ export const deleteCompanyService = async ({ id }) => {
         },
       };
     }
-    await updateSql("placement_companies", { deleted: true }, `id = ?`, [id]);
+    await updateSql("placement_companies", { deleted: true }, `id  = $1`, [id]);
 
     return {
       status: 200,

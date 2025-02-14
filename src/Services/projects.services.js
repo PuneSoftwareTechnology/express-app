@@ -57,7 +57,7 @@ export const getProjectsService = async (relatedCourse) => {
 
 export const deleteProjectService = async ({ id }) => {
   try {
-    const project = await findAll("projects", "id = ? AND deleted = false", [
+    const project = await findAll("projects", "id  = $1 AND deleted = false", [
       id,
     ]);
 
@@ -67,7 +67,7 @@ export const deleteProjectService = async ({ id }) => {
         "Project does not exist or has already been deleted."
       );
     }
-    await updateSql("projects", { deleted: true }, "id = ?", [id]);
+    await updateSql("projects", { deleted: true }, "id  = $1", [id]);
 
     return {
       status: 200,
@@ -90,7 +90,7 @@ export const updateProjectService = async (payload) => {
       return sendError(400, "Project ID is required.");
     }
 
-    const project = await findAll("projects", "id = ?", [id]);
+    const project = await findAll("projects", "id  = $1", [id]);
     if (project.length === 0) {
       return sendError(
         404,
@@ -102,7 +102,7 @@ export const updateProjectService = async (payload) => {
       return sendError(400, "No fields to update.");
     }
 
-    await updateSql("projects", data, "id = ?", [id]);
+    await updateSql("projects", data, "id  = $1", [id]);
 
     return {
       status: 200,

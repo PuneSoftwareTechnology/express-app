@@ -33,7 +33,7 @@ export const getJobsService = async (related_course) => {
   try {
     let query = "SELECT * FROM jobs WHERE deleted = false";
     if (related_course) {
-      query += ` AND related_course = ?`;
+      query += ` AND related_course  = $1`;
     }
 
     const responses = await executeRawQuery(
@@ -59,12 +59,12 @@ export const getJobsService = async (related_course) => {
 
 export const deleteJobService = async ({ id }) => {
   try {
-    const job = await findAll("jobs", "id = ? AND deleted = false", [id]);
+    const job = await findAll("jobs", "id  = $1 AND deleted = false", [id]);
 
     if (job.length === 0) {
       return sendError(404, "Job does not exist or has already been deleted.");
     }
-    await updateSql("jobs", { deleted: true }, "id = ?", [id]);
+    await updateSql("jobs", { deleted: true }, "id  = $1", [id]);
 
     return {
       status: 200,
@@ -87,7 +87,7 @@ export const updateJobService = async (payload) => {
       return sendError(400, "Job ID is required.");
     }
 
-    const job = await findAll("jobs", "id = ?", [id]);
+    const job = await findAll("jobs", "id  = $1", [id]);
     if (job.length === 0) {
       return sendError(404, "Job does not exist or has already been deleted.");
     }
@@ -96,7 +96,7 @@ export const updateJobService = async (payload) => {
       return sendError(400, "No fields to update.");
     }
 
-    await updateSql("jobs", data, "id = ?", [id]);
+    await updateSql("jobs", data, "id  = $1", [id]);
 
     return {
       status: 200,

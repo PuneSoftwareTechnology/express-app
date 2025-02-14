@@ -63,12 +63,12 @@ export const getFAQsService = async (relatedTopic) => {
 
 export const deleteFAQService = async ({ id }) => {
   try {
-    const faq = await findAll("faqs", "id = ? AND deleted = false", [id]);
+    const faq = await findAll("faqs", "id  = $1 AND deleted = false", [id]);
 
     if (faq.length === 0) {
       return sendError(404, "FAQ does not exist or has already been deleted.");
     }
-    await updateSql("faqs", { deleted: true }, "id = ?", [id]);
+    await updateSql("faqs", { deleted: true }, "id  = $1", [id]);
 
     return {
       status: 200,
@@ -87,7 +87,7 @@ export const updateFAQService = async (payload) => {
   try {
     const { id, ...data } = payload;
 
-    const faq = await findAll("faqs", "id = ?", [id]);
+    const faq = await findAll("faqs", "id  = $1", [id]);
     if (faq.length === 0) {
       return sendError(404, "FAQ does not exist or has already been deleted.");
     }
@@ -96,7 +96,7 @@ export const updateFAQService = async (payload) => {
       return sendError(400, "No fields to update.");
     }
 
-    await updateSql("faqs", data, "id = ?", [id]);
+    await updateSql("faqs", data, "id  = $1", [id]);
 
     return {
       status: 200,
