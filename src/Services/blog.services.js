@@ -18,7 +18,7 @@ export const createBlogService = async (fields) => {
     ];
     const missingFields = checkMissingFields(fields, requiredFields);
 
-    if (missingFields.length > 0) {
+    if (missingFields?.length > 0) {
       return {
         status: 400,
         data: {
@@ -62,7 +62,7 @@ export const fetchBlogService = async (landing_page) => {
     const pageType = landing_page?.landing_page || ""; // Extract the actual string
 
     let baseQuery =
-      "SELECT id, introduction, featured_image, title, slug, created_at, category,  author_id FROM blog_posts WHERE deleted = false";
+      "SELECT id, introduction, featured_image, title, slug, created_at, category_id,  author_id FROM blog_posts WHERE deleted = false";
 
     const queryOptions = {
       blog: " AND status = 'PUBLISHED' ORDER BY created_at DESC",

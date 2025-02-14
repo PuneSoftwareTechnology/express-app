@@ -8,8 +8,6 @@ import {
 import { checkMissingFields, sendError } from "../utils/helperFunctions.js";
 
 export const saveCourseService = async (payload) => {
-  console.log(payload);
-
   try {
     const requiredFields = [
       "name",
@@ -22,13 +20,14 @@ export const saveCourseService = async (payload) => {
       "modules",
       "prerequisite",
       "related_courses",
-      "category",
+      "category_id",
     ];
     const missingFieldsError = checkMissingFields(payload, requiredFields);
     if (missingFieldsError) return missingFieldsError;
 
     const processedPayload = {
       ...payload,
+      intro: JSON.stringify(payload.intro || []),
       modules: JSON.stringify(payload.modules || []),
       prerequisite: JSON.stringify(payload.prerequisite || []),
       related_courses: JSON.stringify(payload.related_courses || []),
@@ -81,7 +80,9 @@ export const getCoursesService = async (category) => {
 
 export const deleteCourseService = async ({ id }) => {
   try {
-    const course = await findAll("courses", "id  = $1 AND deleted = false", [id]);
+    const course = await findAll("courses", "id  = $1 AND deleted = false", [
+      id,
+    ]);
 
     if (course.length === 0) {
       return sendError(
