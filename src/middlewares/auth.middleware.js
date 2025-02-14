@@ -24,7 +24,7 @@ export const authenticate = async (req, res, next) => {
     const decoded = jwt.verify(token, process.env.JWT_SECRET); // Verify the token with the secret key
 
     // Check if the user exists and if the user is deleted using email
-    const user = await findAll("users", "email = ?", [decoded.email]);
+    const user = await findAll("users", "email = $1", [decoded.email]);
 
     if (user[0]?.deleted) {
       return res.status(404).json({ message: "USER_NOT_FOUND" });
