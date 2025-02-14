@@ -53,7 +53,7 @@ export const deleteTestimonialService = async ({ id }) => {
   try {
     const testimonial = await findAll(
       "testimonials",
-      "id  = $1 AND deleted = false",
+      "id = $1 AND deleted = false",
       [id]
     );
 
@@ -63,7 +63,7 @@ export const deleteTestimonialService = async ({ id }) => {
         "Testimonial does not exist or has already been deleted."
       );
     }
-    await updateSql("testimonials", { deleted: true }, "id  = $1", [id]);
+    await updateSql("testimonials", { deleted: true }, "id = $1", [id]);
 
     return {
       status: 200,
@@ -86,7 +86,7 @@ export const updateTestimonialService = async (payload) => {
       return sendError(400, "Testimonial ID is required.");
     }
 
-    const testimonial = await findAll("testimonials", "id  = $1", [id]);
+    const testimonial = await findAll("testimonials", "id = $1", [id]);
     if (testimonial.length === 0) {
       return sendError(
         404,
@@ -98,7 +98,7 @@ export const updateTestimonialService = async (payload) => {
       return sendError(400, "No fields to update.");
     }
 
-    await updateSql("testimonials", data, "id  = $1", [id]);
+    await updateSql("testimonials", data, "id = $1", [id]);
 
     return {
       status: 200,

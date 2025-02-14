@@ -88,14 +88,23 @@ export async function updateSql(table, data, whereClause, whereParams = []) {
     }
 
     const setClause = Object.keys(data)
-      .map((key, i) => `${key} = $${i + 1}`)
+      .map((key, i) => `${key} = $${i + 1}`) // Properly numbering placeholders
       .join(", ");
-    const query = `UPDATE ${table} SET ${setClause} WHERE ${whereClause}`;
+
+    // Offset WHERE clause placeholders correctly
+    const whereOffset = Object.keys(data).length;
+    const adjustedWhereClause = whereClause.replace(
+      /\$(\d+)/g,
+      (_, num) => `$${parseInt(num) + whereOffset}`
+    );
+
+    const query = `UPDATE ${table} SET ${setClause} WHERE ${adjustedWhereClause}`;
     const client = await pool.connect();
     const result = await client.query(query, [
       ...Object.values(data),
-      ...whereParams,
+      ...whereParams, // Ensuring proper parameter order
     ]);
+
     client.release();
     return result.rowCount;
   } catch (error) {
