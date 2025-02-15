@@ -8,7 +8,7 @@ import { checkMissingFields, sendError } from "../utils/helperFunctions.js";
 
 export const saveTestimonialService = async (payload) => {
   try {
-    const requiredFields = ["name", "message", "designation"];
+    const requiredFields = ["name", "star_rating", "testimonial"];
     const missingFieldsError = checkMissingFields(payload, requiredFields);
     if (missingFieldsError) return missingFieldsError;
 

@@ -3,17 +3,15 @@ import { checkMissingFields, sendError } from "../utils/helperFunctions.js";
 
 export const saveCompanyService = async (payload) => {
   try {
-    const requiredFields = ["company_name", "company_logo"];
+    const requiredFields = ["name", "logo_url"];
 
     const missingFieldsError = checkMissingFields(payload, requiredFields);
     if (missingFieldsError) return missingFieldsError;
 
     // Check if the company already exists
-    const existingCompanies = await findAll(
-      "placement_companies",
-      "company_name  = $1 ",
-      [payload.company_name]
-    );
+    const existingCompanies = await findAll("companies", "name  = $1 ", [
+      payload.name,
+    ]);
 
     if (existingCompanies.length > 0) {
       return {
@@ -25,7 +23,7 @@ export const saveCompanyService = async (payload) => {
       };
     }
 
-    await insert("placement_companies", payload);
+    await insert("companies", payload);
 
     return {
       status: 200,
@@ -42,7 +40,7 @@ export const saveCompanyService = async (payload) => {
 
 export const getAllCompaniesService = async () => {
   try {
-    const companies = await findAll("placement_companies", "deleted = 0");
+    const companies = await findAll("companies", "deleted = false");
 
     return {
       status: 200,
@@ -61,9 +59,14 @@ export const getAllCompaniesService = async () => {
 export const editCompanyService = async (payload) => {
   try {
     const { id, ...data } = payload;
-    const existingCompanies = await findAll("placement_companies", "id  = $1", [
-      id,
-    ]);
+
+    // Ensure ID is a valid string
+    if (!id || typeof id !== "string") {
+      throw new Error("Invalid ID format");
+    }
+
+    // Use a parameterized query to prevent SQL errors
+    const existingCompanies = await findAll("companies", "id = $1", [id]);
 
     if (existingCompanies.length === 0) {
       return {
@@ -75,7 +78,8 @@ export const editCompanyService = async (payload) => {
       };
     }
 
-    await updateSql("placement_companies", data, `id = ${id}`);
+    // Fix update query to use parameterized ID
+    await updateSql("companies", data, "id = $1", [id]);
 
     return {
       status: 200,
@@ -92,9 +96,7 @@ export const editCompanyService = async (payload) => {
 
 export const deleteCompanyService = async ({ id }) => {
   try {
-    const existingCompanies = await findAll("placement_companies", "id  = $1", [
-      id,
-    ]);
+    const existingCompanies = await findAll("companies", "id  = $1", [id]);
 
     if (existingCompanies.length === 0) {
       return {
@@ -105,7 +107,7 @@ export const deleteCompanyService = async ({ id }) => {
         },
       };
     }
-    await updateSql("placement_companies", { deleted: true }, `id  = $1`, [id]);
+    await updateSql("companies", { deleted: true }, `id  = $1`, [id]);
 
     return {
       status: 200,

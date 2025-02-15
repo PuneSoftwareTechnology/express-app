@@ -14,6 +14,8 @@ export const createFAQService = async (fields) => {
       "answer",
       "related_topic",
       "user_email",
+      "category_id",
+      "course_id",
     ];
     const missingFieldsError = checkMissingFields(fields, requiredFields);
     if (missingFieldsError) return missingFieldsError;
@@ -36,11 +38,11 @@ export const createFAQService = async (fields) => {
   }
 };
 
-export const getFAQsService = async (relatedTopic) => {
+export const getFAQsService = async (course) => {
   try {
     let query = "SELECT * FROM faqs WHERE deleted = false";
-    if (relatedTopic) {
-      query += ` AND related_topic ='${relatedTopic?.related_topic}' `;
+    if (course) {
+      query += ` AND course_id ='${course?.course_id}' `;
     }
 
     const responses = await executeRawQuery(query);

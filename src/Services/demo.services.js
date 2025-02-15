@@ -19,7 +19,7 @@ export const processDemoRequest = async (fields) => {
     sanitizedData.email = sanitizedData.email.toLowerCase();
 
     // Insert into the database
-    await insert("demo_responses", sanitizedData);
+    await insert("demos", sanitizedData);
 
     return {
       status: 200,
@@ -37,7 +37,7 @@ export const processDemoRequest = async (fields) => {
 export const getAllresponses = async () => {
   try {
     const responses = await executeRawQuery(
-      "SELECT * FROM demo_responses WHERE deleted = false"
+      "SELECT * FROM demos WHERE deleted = false"
     );
     return {
       status: 200,
@@ -58,7 +58,7 @@ export const getAllresponses = async () => {
 export const updateDemoService = async (payload) => {
   try {
     const { id, ...data } = payload;
-    const demo = await findAll("demo_responses", "id  = $1", [id]);
+    const demo = await findAll("demos", "id  = $1", [id]);
     if (demo.length === 0) {
       return sendError(
         404,
@@ -70,7 +70,7 @@ export const updateDemoService = async (payload) => {
       return sendError(400, "No fields to update.");
     }
 
-    await updateSql("demo_responses", data, "id  = $1", [id]);
+    await updateSql("demos", data, "id  = $1", [id]);
 
     return {
       status: 200,
@@ -90,14 +90,12 @@ export const updateDemoService = async (payload) => {
 
 export const deleteDemoService = async ({ id }) => {
   try {
-    const demo = await findAll("demo_responses", "id  = $1 AND deleted = false", [
-      id,
-    ]);
+    const demo = await findAll("demos", "id  = $1 AND deleted = false", [id]);
 
     if (demo.length === 0) {
       return sendError(404, "Demo does not exist or has already been deleted.");
     }
-    await updateSql("demo_responses", { deleted: true }, "id  = $1", [id]);
+    await updateSql("demos", { deleted: true }, "id  = $1", [id]);
 
     return {
       status: 200,

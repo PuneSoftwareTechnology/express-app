@@ -16,7 +16,7 @@ export const saveNotificationEMailService = async (payload) => {
 
     const emailRecords = emails.map((email) => ({ email, user_email }));
 
-    await bulkInsert("email_notification", emailRecords);
+    await bulkInsert("notification_emails", emailRecords);
 
     return {
       status: 200,
@@ -36,7 +36,7 @@ export const saveNotificationEMailService = async (payload) => {
 
 export const getAllActiveNotificationsService = async () => {
   try {
-    const emails = await findAll("email_notification", "deleted = false");
+    const emails = await findAll("notification_emails", "deleted = false");
     return {
       status: 200,
       data: {
@@ -66,28 +66,36 @@ export const deleteEmailsService = async (payload) => {
       return sendError(400, "Emails should be a non-empty array.");
     }
 
-    if (!user_email) {
-      return sendError(400, "User email is required.");
-    }
-
-    // Check if the emails are present for the given user_email
-    const placeholders = emails.map(() => "?").join(", ");
+    // Check if the emails exist
+    const placeholders = emails.map((_, index) => `$${index + 1}`).join(", ");
     const existingEmails = await findAll(
-      "email_notification",
-      `email IN (${placeholders}) AND user_email  = $1 AND deleted  = $2`,
-      [...emails, user_email, false]
+      "notification_emails",
+      `email IN (${placeholders}) AND deleted = $${emails.length + 1}`,
+      [...emails, false]
     );
 
     if (existingEmails.length === 0) {
-      return sendError(404, "No matching emails found for the given user.");
+      return sendError(404, "No matching emails found.");
     }
 
     const existingEmailAddresses = existingEmails.map((record) => record.email);
+
+    // Ensure there are existing emails to update
+    if (existingEmailAddresses.length === 0) {
+      return sendError(404, "No emails found to delete.");
+    }
+
+    // Generate placeholders dynamically for WHERE clause
+    const updatePlaceholders = existingEmailAddresses
+      .map((_, index) => `$${index + 1}`)
+      .join(", ");
+
+    // Call updateSql function
     await updateSql(
-      "email_notification",
-      { deleted: true },
-      `email IN (${placeholders}) AND user_email  = $1`,
-      [...existingEmailAddresses, user_email]
+      "notification_emails",
+      { deleted: true }, // Properly formatted object for SET clause
+      `email IN (${updatePlaceholders})`, // Adjusted WHERE clause
+      existingEmailAddresses // Properly passed whereParams
     );
 
     return {
@@ -95,6 +103,7 @@ export const deleteEmailsService = async (payload) => {
       data: {
         success: true,
         message: "Emails deleted successfully.",
+        performed_by: user_email, // Just for tracking
       },
     };
   } catch (error) {
