@@ -9,6 +9,7 @@ import {
   deleteCourseSyllabusController,
   updateCourseSyllabusController,
   getCourseNamesController,
+  getCourseCategoriesController,
 } from "../controllers/courses.controller.js";
 import { authenticate } from "../middlewares/auth.middleware.js";
 
@@ -36,5 +37,7 @@ CourseRouter.patch(
   authenticate,
   updateCourseSyllabusController
 );
+
+CourseRouter.get("/categories", authenticate, getCourseCategoriesController);
 
 export default CourseRouter;

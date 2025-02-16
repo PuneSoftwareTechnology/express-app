@@ -62,7 +62,7 @@ export const fetchBlogService = async (landing_page) => {
     const pageType = landing_page?.landing_page || ""; // Extract the actual string
 
     let baseQuery =
-      "SELECT id, introduction, featured_image, title, slug, created_at, category_id,  author_id FROM blog_posts WHERE deleted = false";
+      "SELECT id, introduction, featured_image, title, slug, created_at, category_id, course_id, author_id FROM blog_posts WHERE deleted = false";
 
     const queryOptions = {
       blog: " AND status = 'PUBLISHED' ORDER BY created_at DESC",
@@ -72,7 +72,7 @@ export const fetchBlogService = async (landing_page) => {
     const query =
       pageType in queryOptions
         ? baseQuery + queryOptions[pageType]
-        : "SELECT id, title, slug, created_at, author_id,category, status FROM blog_posts WHERE deleted = false";
+        : "SELECT id, title, slug, created_at, author_id, category_id, status FROM blog_posts WHERE deleted = false";
 
     const blogs = await executeRawQuery(query);
 

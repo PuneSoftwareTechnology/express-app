@@ -12,7 +12,6 @@ export const createFAQService = async (fields) => {
     const requiredFields = [
       "question",
       "answer",
-      "related_topic",
       "user_email",
       "category_id",
       "course_id",
