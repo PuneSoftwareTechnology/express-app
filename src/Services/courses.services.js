@@ -54,7 +54,7 @@ export const getCoursesService = async (category) => {
   try {
     let query = "SELECT * FROM courses WHERE deleted = false";
     if (category) {
-      query += ` AND category_id  = $1`;
+      query = ` SELECT id, name, description, slug, featured_image from courses where deleted = FALSE and category_id = $1`;
     }
 
     const responses = await executeRawQuery(
@@ -405,6 +405,110 @@ export const getCourseCategoriesService = async () => {
     };
   } catch (error) {
     console.error("Error in getCourseCatgoriesService:", error);
+    return sendError(
+      "An internal server error occurred. Please try again later."
+    );
+  }
+};
+
+export const getCourseDetailsService = async ({ slug }) => {
+  try {
+    const courseQuery = `SELECT 
+                                c1.id,
+                                c1.name,
+                                c1.intro,
+                                c1.featured_image,
+                                c1.description,
+                                c1.training_procedure,
+                                c1.slug,
+                                c1.module_heading,
+                                c1.modules,
+                                c1.prerequisite,
+                                c1.created_at,
+                                c1.updated_at,
+                                c1.user_email,
+                                c1.deleted,
+                                c1.category_id,
+                                COALESCE(
+                                    jsonb_agg(
+                                        jsonb_build_object(
+                                            'id', related_courses_info.id,
+                                            'name', related_courses_info.name,
+                                            'slug', related_courses_info.slug,
+                                            'featured_image', related_courses_info.featured_image
+                                        )
+                                    ) FILTER (WHERE related_courses_info.deleted = false), '[]'::jsonb
+                                ) AS related_courses
+                            FROM 
+                                courses c1
+                            LEFT JOIN 
+                                courses related_courses_info
+                                ON related_courses_info.id = ANY (SELECT jsonb_array_elements_text(c1.related_courses)::uuid)
+                            WHERE 
+                                c1.slug = $1
+                                AND c1.deleted = false
+                            GROUP BY 
+                                c1.id`;
+    const course = await executeRawQuery(courseQuery, [slug]);
+
+    if (course.length === 0) {
+      return {
+        status: 404,
+        data: {
+          success: false,
+          message: "Course not found!",
+        },
+      };
+    }
+
+    const courseId = course[0].id;
+
+    const projectsQuery =
+      "SELECT id, name, description FROM projects WHERE related_course = $1 AND deleted = false";
+    const projects = await executeRawQuery(projectsQuery, [courseId]);
+
+    const syllabusQuery =
+      "SELECT * FROM course_syllabus WHERE course_id = $1 AND deleted = false";
+    const syllabusResponses = await executeRawQuery(syllabusQuery, [courseId]);
+
+    const formattedSyllabus = Object.values(
+      syllabusResponses.reduce((acc, { course_id, module_name, lessons }) => {
+        if (!acc[course_id]) {
+          acc[course_id] = {
+            course_id,
+
+            courses_syllabus: [],
+          };
+        }
+
+        acc[course_id].courses_syllabus.push({
+          module_name,
+          lessons,
+        });
+
+        return acc;
+      }, {})
+    );
+
+    const jobsQuery =
+      "SELECT id,name,description FROM jobs WHERE related_course = $1 AND deleted = false";
+    const jobs = await executeRawQuery(jobsQuery, [courseId]);
+
+    return {
+      status: 200,
+      data: {
+        success: true,
+        message: "Course details fetched successfully!",
+        data: {
+          course: course[0],
+          projects,
+          syllabus: formattedSyllabus,
+          jobs,
+        },
+      },
+    };
+  } catch (error) {
+    console.error("Error in getCourseDetailsService:", error);
     return sendError(
       "An internal server error occurred. Please try again later."
     );

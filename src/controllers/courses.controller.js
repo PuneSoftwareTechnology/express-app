@@ -9,6 +9,7 @@ import {
   updateCourseSyllabusService,
   getCourseNamesService,
   getCourseCategoriesService,
+  getCourseDetailsService, // Import the new service
 } from "../Services/courses.services.js";
 import { handleResponse } from "../utils/helperFunctions.js";
 
@@ -41,3 +42,6 @@ export const getCourseNamesController = (req, res) =>
 
 export const getCourseCategoriesController = (req, res) =>
   handleResponse(getCourseCategoriesService, req, res);
+
+export const getCourseDetailsController = (req, res) =>
+  handleResponse(getCourseDetailsService, req, res); // Add the new controller

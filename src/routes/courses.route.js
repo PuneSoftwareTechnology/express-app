@@ -10,6 +10,7 @@ import {
   updateCourseSyllabusController,
   getCourseNamesController,
   getCourseCategoriesController,
+  getCourseDetailsController, // Import the new controller
 } from "../controllers/courses.controller.js";
 import { authenticate } from "../middlewares/auth.middleware.js";
 
@@ -39,5 +40,8 @@ CourseRouter.patch(
 );
 
 CourseRouter.get("/categories", getCourseCategoriesController);
+
+// Add the new route for course details
+CourseRouter.get("/get-course-details", getCourseDetailsController);
 
 export default CourseRouter;
