@@ -19,7 +19,7 @@ CourseRouter.post("/create", authenticate, createCourseController);
 CourseRouter.get("/all", getCoursesController);
 CourseRouter.patch("/delete", authenticate, deleteCourseController);
 CourseRouter.patch("/update", authenticate, updateCourseController);
-CourseRouter.get("/all-course-names", authenticate, getCourseNamesController);
+CourseRouter.get("/all-course-names", getCourseNamesController);
 //syllabus
 CourseRouter.post(
   "/syllabus/create",
@@ -38,6 +38,6 @@ CourseRouter.patch(
   updateCourseSyllabusController
 );
 
-CourseRouter.get("/categories", authenticate, getCourseCategoriesController);
+CourseRouter.get("/categories", getCourseCategoriesController);
 
 export default CourseRouter;
