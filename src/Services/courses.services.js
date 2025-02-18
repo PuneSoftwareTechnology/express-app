@@ -503,6 +503,12 @@ export const getCourseDetailsService = async ({ slug }) => {
       [courseId]
     );
 
+    const faqs = await executeRawQuery(
+      // "SELECT id, slug, featured_image FROM blog_posts WHERE deleted = false AND course_id = $1",
+      "SELECT * FROM faqs WHERE deleted = false AND course_id = $1",
+      [courseId]
+    );
+
     return {
       status: 200,
       data: {
@@ -515,6 +521,7 @@ export const getCourseDetailsService = async ({ slug }) => {
           jobs,
           testimonials,
           blogs,
+          faqs,
         },
       },
     };
