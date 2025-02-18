@@ -493,6 +493,15 @@ export const getCourseDetailsService = async ({ slug }) => {
     const jobsQuery =
       "SELECT id,name,description FROM jobs WHERE related_course = $1 AND deleted = false";
     const jobs = await executeRawQuery(jobsQuery, [courseId]);
+    const testimonials = await executeRawQuery(
+      "SELECT * FROM testimonials WHERE deleted = false AND course_id = $1",
+      [courseId]
+    );
+    const blogs = await executeRawQuery(
+      // "SELECT id, slug, featured_image FROM blog_posts WHERE deleted = false AND course_id = $1",
+      "SELECT id, introduction, featured_image, title, slug, created_at, category_id, course_id, author_id FROM blog_posts WHERE deleted = false AND course_id = $1",
+      [courseId]
+    );
 
     return {
       status: 200,
@@ -504,6 +513,8 @@ export const getCourseDetailsService = async ({ slug }) => {
           projects,
           syllabus: formattedSyllabus,
           jobs,
+          testimonials,
+          blogs,
         },
       },
     };
