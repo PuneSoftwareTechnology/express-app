@@ -8,7 +8,7 @@ import { checkMissingFields, sendError } from "../utils/helperFunctions.js";
 
 export const processDemoRequest = async (fields) => {
   try {
-    const requiredFields = ["name", "email", "phone", "message"];
+    const requiredFields = ["name", "email", "phone", "message", "course"];
     const missingFieldsError = checkMissingFields(fields, requiredFields);
     if (missingFieldsError) return missingFieldsError;
 
