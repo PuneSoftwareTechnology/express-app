@@ -37,7 +37,7 @@ export const processDemoRequest = async (fields) => {
 export const getAllresponses = async () => {
   try {
     const responses = await executeRawQuery(
-      "SELECT * FROM demos WHERE deleted = false"
+      "SELECT * FROM demos WHERE deleted = false  order by updated_at desc"
     );
     return {
       status: 200,

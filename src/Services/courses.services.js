@@ -52,9 +52,10 @@ export const saveCourseService = async (payload) => {
 
 export const getCoursesService = async (category) => {
   try {
-    let query = "SELECT * FROM courses WHERE deleted = false";
+    let query =
+      "SELECT * FROM courses WHERE deleted = false  order by updated_at desc";
     if (category) {
-      query = ` SELECT id, name, description, slug, featured_image from courses where deleted = FALSE and category_id = $1`;
+      query = ` SELECT id, name, description, slug, featured_image from courses where deleted = FALSE and category_id = $1  order by updated_at desc`;
     }
 
     const responses = await executeRawQuery(
@@ -167,7 +168,7 @@ export const saveCourseSyllabusService = async (payload) => {
       );
     }
 
-    const requiredFields = ["course_id", "category_id", "user_email"];
+    const requiredFields = ["course_id", "courses_syllabus", "user_email"];
 
     // Check for missing fields in main payload
     const missingFieldsError = checkMissingFields(payload, requiredFields);
@@ -175,7 +176,6 @@ export const saveCourseSyllabusService = async (payload) => {
 
     const processedPayload = payload.courses_syllabus.map((module) => ({
       course_id: payload.course_id,
-      category_id: payload.category_id,
       user_email: payload.user_email || null,
       module_name: module.module_name,
       lessons: JSON.stringify(module.lessons || []),
@@ -202,7 +202,8 @@ export const saveCourseSyllabusService = async (payload) => {
 
 export const getCourseSyllabusService = async (course_id) => {
   try {
-    let query = "SELECT * FROM course_syllabus WHERE deleted = false";
+    let query =
+      "SELECT * FROM course_syllabus WHERE deleted = false order by updated_at desc";
     const queryParams = [];
 
     if (course_id) {
@@ -321,7 +322,7 @@ export const updateCourseSyllabusService = async (payload) => {
       );
     }
 
-    const requiredFields = ["course_id", "category_id", "user_email"];
+    const requiredFields = ["course_id", "courses_syllabus", "user_email"];
 
     // Check for missing fields in main payload
     const missingFieldsError = checkMissingFields(payload, requiredFields);
@@ -329,7 +330,6 @@ export const updateCourseSyllabusService = async (payload) => {
 
     const processedPayload = payload.courses_syllabus.map((module) => ({
       course_id: payload.course_id,
-      category_id: payload.category_id,
       user_email: payload.user_email || null,
       module_name: module.module_name,
       lessons: JSON.stringify(module.lessons || []),
@@ -361,7 +361,8 @@ export const updateCourseSyllabusService = async (payload) => {
 
 export const getCourseNamesService = async () => {
   try {
-    const query = "SELECT id, name FROM courses WHERE deleted = false";
+    const query =
+      "SELECT id, name FROM courses WHERE deleted = false  order by updated_at desc";
     const responses = await executeRawQuery(query);
 
     return {
@@ -389,7 +390,7 @@ export const getCourseNamesService = async () => {
 export const getCourseCategoriesService = async () => {
   try {
     const query =
-      "SELECT id, category_name as name, category_enum FROM course_category WHERE deleted = false";
+      "SELECT id, category_name as name, category_enum FROM course_category WHERE deleted = false  order by updated_at desc";
     const responses = await executeRawQuery(query);
 
     return {
@@ -451,7 +452,7 @@ export const getCourseDetailsService = async ({ slug }) => {
                                 c1.slug = $1
                                 AND c1.deleted = false
                             GROUP BY 
-                                c1.id`;
+                                c1.id  order by updated_at desc`;
     const course = await executeRawQuery(courseQuery, [slug]);
 
     if (course.length === 0) {

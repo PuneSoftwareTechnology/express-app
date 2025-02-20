@@ -31,7 +31,10 @@ export const saveTestimonialService = async (payload) => {
 
 export const getAllTestimonialsService = async () => {
   try {
-    const testimonials = await findAll("testimonials", "deleted = false");
+    const testimonials = await findAll(
+      "testimonials",
+      "deleted = false  order by updated_at desc"
+    );
 
     return {
       status: 200,

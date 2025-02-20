@@ -39,7 +39,8 @@ export const createFAQService = async (fields) => {
 
 export const getFAQsService = async (course) => {
   try {
-    let query = "SELECT * FROM faqs WHERE deleted = false";
+    let query =
+      "SELECT * FROM faqs WHERE deleted = false  order by updated_at desc";
     if (course) {
       query += ` AND course_id ='${course?.course_id}' `;
     }
