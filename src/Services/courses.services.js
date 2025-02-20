@@ -126,6 +126,9 @@ export const updateCourseService = async (payload) => {
     }
 
     // Process fields similarly to saveCourseService
+    if (data.intro) {
+      data.intro = JSON.stringify(data.intro);
+    }
     if (data.modules) {
       data.modules = JSON.stringify(data.modules);
     }
@@ -164,7 +167,7 @@ export const saveCourseSyllabusService = async (payload) => {
       );
     }
 
-    const requiredFields = ["course_id", "user_email"];
+    const requiredFields = ["course_id", "category_id", "user_email"];
 
     // Check for missing fields in main payload
     const missingFieldsError = checkMissingFields(payload, requiredFields);
@@ -172,6 +175,7 @@ export const saveCourseSyllabusService = async (payload) => {
 
     const processedPayload = payload.courses_syllabus.map((module) => ({
       course_id: payload.course_id,
+      category_id: payload.category_id,
       user_email: payload.user_email || null,
       module_name: module.module_name,
       lessons: JSON.stringify(module.lessons || []),
