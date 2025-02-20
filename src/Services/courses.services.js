@@ -390,7 +390,7 @@ export const getCourseNamesService = async () => {
 export const getCourseCategoriesService = async () => {
   try {
     const query =
-      "SELECT id, category_name as name, category_enum FROM course_category WHERE deleted = false  order by updated_at desc";
+      "SELECT id, category_name as name, category_enum FROM course_category WHERE deleted = false  order by created_at desc";
     const responses = await executeRawQuery(query);
 
     return {
