@@ -3,6 +3,7 @@ import {
   getAllresponses,
   processDemoRequest,
   updateDemoService,
+  processConsultationRequest,
 } from "../Services/demo.services.js";
 import { handleResponse } from "../utils/helperFunctions.js";
 
@@ -19,3 +20,6 @@ export const updateDemoController = (req, res) => {
 export const deleteDemoController = (req, res) => {
   handleResponse(deleteDemoService, req, res);
 };
+
+export const handleConsultationRequest = (req, res) =>
+  handleResponse(processConsultationRequest, req, res);

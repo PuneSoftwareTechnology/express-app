@@ -109,3 +109,27 @@ export const deleteDemoService = async ({ id }) => {
     return sendError(500, "Internal server error.");
   }
 };
+
+export const processConsultationRequest = async (fields) => {
+  try {
+    const requiredFields = ["name", "phone_number"];
+    const missingFieldsError = checkMissingFields(fields, requiredFields);
+    if (missingFieldsError) return missingFieldsError;
+
+    // Insert into the database
+    await insert("consultation", fields);
+
+    return {
+      status: 200,
+      data: {
+        success: true,
+        message: "Consultation request processed successfully!",
+      },
+    };
+  } catch (error) {
+    console.error("Error in processConsultationRequest:", error);
+    return sendError(
+      "An internal server error occurred. Please try again later."
+    );
+  }
+};
