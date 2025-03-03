@@ -133,3 +133,53 @@ export const processConsultationRequest = async (fields) => {
     );
   }
 };
+
+export const getAllConsultationsService = async () => {
+  try {
+    const consultations = await executeRawQuery(
+      "SELECT * FROM consultation WHERE deleted = false ORDER BY created_at DESC"
+    );
+    return {
+      status: 200,
+      data: {
+        success: true,
+        message: "Consultations fetched successfully!",
+        data: consultations,
+      },
+    };
+  } catch (error) {
+    console.error("Error in fetching consultations:", error);
+    return sendError(
+      "An internal server error occurred. Please try again later."
+    );
+  }
+};
+
+export const deleteConsultationService = async ({ id }) => {
+  try {
+    const consultation = await findAll(
+      "consultation",
+      "id = $1 AND deleted = false",
+      [id]
+    );
+
+    if (consultation.length === 0) {
+      return sendError(
+        404,
+        "Consultation does not exist or has already been deleted."
+      );
+    }
+    await updateSql("consultation", { deleted: true }, "id = $1", [id]);
+
+    return {
+      status: 200,
+      data: {
+        success: true,
+        message: "Consultation marked as deleted successfully.",
+      },
+    };
+  } catch (error) {
+    console.error("Error in deleteConsultationService:", error);
+    return sendError(500, "Internal server error.");
+  }
+};
