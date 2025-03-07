@@ -27,10 +27,24 @@ export const saveCourseService = async (payload) => {
 
     const processedPayload = {
       ...payload,
-      intro: JSON.stringify(payload.intro || []),
-      modules: JSON.stringify(payload.modules || []),
-      prerequisite: JSON.stringify(payload.prerequisite || []),
-      related_courses: JSON.stringify(payload.related_courses || []),
+      intro: JSON.stringify(
+        Array.isArray(payload.intro) ? payload.intro : [payload.intro] || []
+      ),
+      modules: JSON.stringify(
+        Array.isArray(payload.modules)
+          ? payload.modules
+          : [payload.modules] || []
+      ),
+      prerequisite: JSON.stringify(
+        Array.isArray(payload.prerequisite)
+          ? payload.prerequisite
+          : [payload.prerequisite] || []
+      ),
+      related_courses: JSON.stringify(
+        Array.isArray(payload.related_courses)
+          ? payload.related_courses
+          : [payload.related_courses] || []
+      ),
     };
 
     await insert("courses", processedPayload);
