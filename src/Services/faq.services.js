@@ -39,13 +39,17 @@ export const createFAQService = async (fields) => {
 
 export const getFAQsService = async (course) => {
   try {
-    let query =
-      "SELECT * FROM faqs WHERE deleted = false  order by updated_at desc";
-    if (course) {
-      query += ` AND course_id ='${course?.course_id}' `;
+    let query = "SELECT * FROM faqs WHERE deleted = false";
+    const params = [];
+
+    if (course?.course_id) {
+      query += " AND course_id = ?";
+      params.push(course.course_id);
     }
 
-    const responses = await executeRawQuery(query);
+    query += " ORDER BY updated_at DESC";
+
+    const responses = await executeRawQuery(query, params);
 
     return {
       status: 200,
@@ -62,6 +66,7 @@ export const getFAQsService = async (course) => {
     );
   }
 };
+
 
 export const deleteFAQService = async ({ id }) => {
   try {
