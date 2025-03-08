@@ -516,7 +516,7 @@ export const getCourseDetailsService = async ({ slug }) => {
       [courseId]
     );
     const blogs = await executeRawQuery(
-      "SELECT id, introduction, featured_image, title, slug, created_at, category_id, course_id, author_id FROM blog_posts WHERE deleted = false AND course_id = $1 order by updated_at desc",
+      "SELECT id, introduction, featured_image, title, slug, created_at, category_id, course_id, author_id FROM blog_posts WHERE deleted = false AND course_id = $1 AND status = 'PUBLISHED' order by updated_at desc",
       [courseId]
     );
 
