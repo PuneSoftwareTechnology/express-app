@@ -31,7 +31,8 @@ export const saveJobService = async (payload) => {
 
 export const getJobsService = async (related_course) => {
   try {
-    let query = "SELECT * FROM jobs WHERE deleted = false";
+    let query =
+      "SELECT * FROM jobs WHERE deleted = false order by updated_at desc";
     if (related_course) {
       query += ` AND related_course  = $1`;
     }

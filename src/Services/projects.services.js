@@ -32,7 +32,8 @@ export const saveProjectService = async (payload) => {
 
 export const getProjectsService = async (relatedCourse) => {
   try {
-    let query = "SELECT * FROM projects WHERE deleted = false";
+    let query =
+      "SELECT * FROM projects WHERE deleted = false order by updated_at desc";
     if (relatedCourse) {
       query += ` AND related_topic ='${relatedCourse?.relatedCourse}' `;
     }
