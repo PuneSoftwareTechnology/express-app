@@ -217,7 +217,7 @@ export const saveCourseSyllabusService = async (payload) => {
 export const getCourseSyllabusService = async (course_id) => {
   try {
     let query =
-      "SELECT * FROM course_syllabus WHERE deleted = false ORDER BY created_at ASC";
+      "SELECT * FROM course_syllabus WHERE deleted = false ORDER BY module_index ASC";
     const queryParams = [];
 
     if (course_id) {
@@ -246,6 +246,7 @@ export const getCourseSyllabusService = async (course_id) => {
             course_id,
             category_id,
             module_name,
+            module_index,
             lessons,
             deleted,
             user_email,
@@ -267,6 +268,7 @@ export const getCourseSyllabusService = async (course_id) => {
 
           acc[course_id].courses_syllabus.push({
             module_name,
+            module_index,
             lessons,
             created_at,
           });
@@ -276,9 +278,7 @@ export const getCourseSyllabusService = async (course_id) => {
         {}
       )
     ).map((course) => {
-      course.courses_syllabus.sort(
-        (a, b) => new Date(a.created_at) - new Date(b.created_at)
-      );
+      course.courses_syllabus.sort((a, b) => a.module_index - b.module_index);
       return course;
     });
 
@@ -330,6 +330,8 @@ export const deleteCourseSyllabusService = async ({ course_id }) => {
 };
 
 export const updateCourseSyllabusService = async (payload) => {
+  console.log(payload);
+
   try {
     if (
       !payload ||
@@ -352,6 +354,7 @@ export const updateCourseSyllabusService = async (payload) => {
       course_id: payload.course_id,
       user_email: payload.user_email || null,
       module_name: module.module_name,
+      module_index: parseInt(module.module_index),
       lessons: JSON.stringify(module.lessons || []),
     }));
 
@@ -492,7 +495,7 @@ export const getCourseDetailsService = async ({ slug }) => {
     const projects = await executeRawQuery(projectsQuery, [courseId]);
 
     const syllabusQuery =
-      "SELECT * FROM course_syllabus WHERE course_id = $1   AND deleted = false ORDER BY created_at ASC";
+      "SELECT * FROM course_syllabus WHERE course_id = $1   AND deleted = false ORDER BY module_index ASC";
 
     const syllabusResponses = await executeRawQuery(syllabusQuery, [courseId]);
 
