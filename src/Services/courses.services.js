@@ -217,7 +217,7 @@ export const saveCourseSyllabusService = async (payload) => {
 export const getCourseSyllabusService = async (course_id) => {
   try {
     let query =
-      "SELECT * FROM course_syllabus WHERE deleted = false order by created_at desc";
+      "SELECT * FROM course_syllabus WHERE deleted = false ORDER BY created_at ASC";
     const queryParams = [];
 
     if (course_id) {
@@ -268,13 +268,19 @@ export const getCourseSyllabusService = async (course_id) => {
           acc[course_id].courses_syllabus.push({
             module_name,
             lessons,
+            created_at,
           });
 
           return acc;
         },
         {}
       )
-    );
+    ).map((course) => {
+      course.courses_syllabus.sort(
+        (a, b) => new Date(a.created_at) - new Date(b.created_at)
+      );
+      return course;
+    });
 
     return {
       status: 200,
@@ -486,27 +492,38 @@ export const getCourseDetailsService = async ({ slug }) => {
     const projects = await executeRawQuery(projectsQuery, [courseId]);
 
     const syllabusQuery =
-      "SELECT * FROM course_syllabus WHERE course_id = $1 AND deleted = false  order by created_at";
+      "SELECT * FROM course_syllabus WHERE course_id = $1   AND deleted = false ORDER BY created_at ASC";
+
     const syllabusResponses = await executeRawQuery(syllabusQuery, [courseId]);
 
     const formattedSyllabus = Object.values(
-      syllabusResponses.reduce((acc, { course_id, module_name, lessons }) => {
-        if (!acc[course_id]) {
-          acc[course_id] = {
-            course_id,
+      syllabusResponses.reduce(
+        (acc, { course_id, module_name, lessons, created_at }) => {
+          if (!acc[course_id]) {
+            acc[course_id] = {
+              course_id,
+              courses_syllabus: [],
+            };
+          }
 
-            courses_syllabus: [],
-          };
-        }
+          acc[course_id].courses_syllabus.push({
+            module_name,
+            lessons,
+            created_at, // Include created_at for sorting
+          });
 
-        acc[course_id].courses_syllabus.push({
-          module_name,
-          lessons,
-        });
+          return acc;
+        },
+        {}
+      )
+    ).map((course) => {
+      course.courses_syllabus.sort(
+        (a, b) => new Date(a.created_at) - new Date(b.created_at)
+      );
+      return course;
+    });
 
-        return acc;
-      }, {})
-    );
+    console.log(formattedSyllabus);
 
     const jobsQuery =
       "SELECT id,name,description FROM jobs WHERE related_course = $1 AND deleted = false";
