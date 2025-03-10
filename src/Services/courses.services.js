@@ -217,7 +217,7 @@ export const saveCourseSyllabusService = async (payload) => {
 export const getCourseSyllabusService = async (course_id) => {
   try {
     let query =
-      "SELECT * FROM course_syllabus WHERE deleted = false order by updated_at desc";
+      "SELECT * FROM course_syllabus WHERE deleted = false order by created_at desc";
     const queryParams = [];
 
     if (course_id) {
@@ -486,7 +486,7 @@ export const getCourseDetailsService = async ({ slug }) => {
     const projects = await executeRawQuery(projectsQuery, [courseId]);
 
     const syllabusQuery =
-      "SELECT * FROM course_syllabus WHERE course_id = $1 AND deleted = false";
+      "SELECT * FROM course_syllabus WHERE course_id = $1 AND deleted = false  order by created_at";
     const syllabusResponses = await executeRawQuery(syllabusQuery, [courseId]);
 
     const formattedSyllabus = Object.values(
