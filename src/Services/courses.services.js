@@ -482,7 +482,7 @@ export const getCourseDetailsService = async ({ slug }) => {
     const courseId = course[0].id;
 
     const projectsQuery =
-      "SELECT id, name, description FROM projects WHERE related_course = $1 AND deleted = false";
+      "SELECT id, name, description FROM projects WHERE related_course = $1 AND deleted = false order by created_at";
     const projects = await executeRawQuery(projectsQuery, [courseId]);
 
     const syllabusQuery =
