@@ -8,9 +8,6 @@ import { checkMissingFields, sendError } from "../utils/helperFunctions.js";
 
 export const processDemoRequest = async (fields) => {
   try {
-    const requiredFields = ["name", "email", "phone", "message", "course"];
-    const missingFieldsError = checkMissingFields(fields, requiredFields);
-    if (missingFieldsError) return missingFieldsError;
 
     // Sanitize input
     const sanitizedData = Object.fromEntries(
