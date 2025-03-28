@@ -1,0 +1,17 @@
+service: express-app
+
+provider:
+  name: aws
+  runtime: nodejs18.x
+  region: ap-south-1 # Change region if needed
+  memorySize: 1024 # Adjust as per need
+  timeout: 30 # Max execution time (in seconds)
+
+functions:
+  app:
+    handler: index.handler
+    events:
+      - httpApi: "*"
+
+plugins:
+  - serverless-offline

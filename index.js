@@ -12,6 +12,7 @@ import companiesRouter from "./src/routes/companies.routes.js";
 import ProjectRouter from "./src/routes/projects.route.js";
 import JobRouter from "./src/routes/jobs.route.js";
 import CourseRouter from "./src/routes/courses.route.js";
+import serverless from "serverless-http";
 
 // Load environment variables
 dotenv.config();
@@ -19,6 +20,7 @@ dotenv.config();
 const app = express();
 const PORT = process.env.PORT || 8080;
 
+// Database connection
 await connectToDatabase();
 
 // Middleware
@@ -43,7 +45,12 @@ app.get("/", (req, res) => {
   res.json({ message: "Welcome to the API!" });
 });
 
-// Start the server
-app.listen(PORT, () => {
-  console.log(`Server running at http://localhost:${PORT}`);
-});
+// Lambda Handler
+export const handler = serverless(app);
+
+// Start the server locally (useful for testing)
+if (process.env.NODE_ENV !== "lambda") {
+  app.listen(PORT, () => {
+    console.log(`Server running at http://localhost:${PORT}`);
+  });
+}
