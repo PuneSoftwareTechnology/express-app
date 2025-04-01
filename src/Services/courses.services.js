@@ -14,7 +14,6 @@ export const saveCourseService = async (payload) => {
       "intro",
       "featured_image",
       "description",
-      "training_procedure",
       "slug",
       "module_heading",
       "modules",
