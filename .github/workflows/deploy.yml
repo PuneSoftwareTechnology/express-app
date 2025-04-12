@@ -35,3 +35,5 @@ jobs:
       # Step 5: Deploy using Serverless Framework
       - name: Deploy to AWS Lambda
         run: npx serverless deploy
+        env:
+          SLS_ACCESS_KEY: ${{ secrets.SERVERLESS_ACCESS_KEY }}
