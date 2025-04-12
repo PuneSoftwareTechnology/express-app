@@ -1,11 +1,14 @@
+org: punesoftwaretechnologies # 🔑 Replace this with your actual org name from Serverless Dashboard
+app: express-app # 🔑 Replace this with any app name you set up (can be same as service)
+
 service: express-app
 
 provider:
   name: aws
   runtime: nodejs18.x
-  region: ap-south-1 # Change region if needed
-  memorySize: 1024 # Adjust as per need
-  timeout: 30 # Max execution time (in seconds)
+  region: ap-south-1
+  memorySize: 1024
+  timeout: 30
 
 functions:
   app:
