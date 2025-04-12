@@ -9,13 +9,7 @@ import { checkMissingFields, sendError } from "../utils/helperFunctions.js";
 export const createFAQService = async (fields) => {
   try {
     // Check for missing required fields
-    const requiredFields = [
-      "question",
-      "answer",
-      "user_email",
-      "category_id",
-      "course_id",
-    ];
+    const requiredFields = ["question", "answer", "user_email"];
     const missingFieldsError = checkMissingFields(fields, requiredFields);
     if (missingFieldsError) return missingFieldsError;
 
@@ -66,7 +60,6 @@ export const getFAQsService = async (course) => {
     );
   }
 };
-
 
 export const deleteFAQService = async ({ id }) => {
   try {
