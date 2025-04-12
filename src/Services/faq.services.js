@@ -36,11 +36,12 @@ export const getFAQsService = async (course) => {
     let query = "SELECT * FROM faqs WHERE deleted = false";
     const params = [];
 
-    if (course?.course_id) {
-      query += " AND course_id = ?";
-      params.push(course.course_id);
+    if (course?.category_id) {
+      query += " AND category_id = $1";
+      params.push(course.category_id);
     }
 
+    // Ensure proper spacing before appending ORDER BY
     query += " ORDER BY updated_at DESC";
 
     const responses = await executeRawQuery(query, params);
@@ -56,6 +57,7 @@ export const getFAQsService = async (course) => {
   } catch (error) {
     console.error("Error in getFAQsService:", error);
     return sendError(
+      500,
       "An internal server error occurred. Please try again later."
     );
   }
