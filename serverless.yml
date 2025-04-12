@@ -2,6 +2,7 @@ org: punesoftwaretechnologies # 🔑 Replace this with your actual org name from
 app: express-app # 🔑 Replace this with any app name you set up (can be same as service)
 
 service: express-app
+useDotenv: true
 
 provider:
   name: aws
@@ -9,6 +10,9 @@ provider:
   region: ap-south-1
   memorySize: 1024
   timeout: 30
+  environment:
+    DB_URL: ${env:DB_URL}
+    JWT_SECRET: ${env:JWT_SECRET}
 
 functions:
   app:
