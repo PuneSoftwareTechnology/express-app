@@ -36,4 +36,4 @@ jobs:
       - name: Deploy to AWS Lambda
         run: npx serverless deploy
         env:
-          SLS_ACCESS_KEY: ${{ secrets.SLS_ACCESS_KEY }}
+          SERVERLESS_ACCESS_KEY: ${{ secrets.SLS_ACCESS_KEY }}
