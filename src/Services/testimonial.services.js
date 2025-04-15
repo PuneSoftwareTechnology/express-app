@@ -29,12 +29,19 @@ export const saveTestimonialService = async (payload) => {
   }
 };
 
-export const getAllTestimonialsService = async () => {
+export const getAllTestimonialsService = async (category) => {
   try {
-    const testimonials = await findAll(
-      "testimonials",
-      "deleted = false  order by updated_at desc"
-    );
+    let query = "SELECT * FROM testimonials WHERE deleted = false";
+    const params = [];
+
+    if (category?.category_id) {
+      query += " AND category_id = $1";
+      params.push(category.category_id);
+    }
+
+    query += " ORDER BY updated_at DESC"; // Ensure proper spacing and placement
+
+    const testimonials = await executeRawQuery(query, params);
 
     return {
       status: 200,
@@ -47,6 +54,7 @@ export const getAllTestimonialsService = async () => {
   } catch (error) {
     console.error("Error in getAllTestimonialsService:", error);
     return sendError(
+      500,
       "An internal server error occurred. Please try again later."
     );
   }

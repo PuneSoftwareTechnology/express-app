@@ -384,7 +384,7 @@ export const updateCourseSyllabusService = async (payload) => {
 export const getCourseNamesService = async () => {
   try {
     const query =
-      "SELECT id, name FROM courses WHERE deleted = false  order by updated_at desc";
+      "SELECT id, name, category_id FROM courses WHERE deleted = false  order by updated_at desc";
     const responses = await executeRawQuery(query);
 
     return {
