@@ -32,7 +32,13 @@ jobs:
           aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
           aws-region: ap-south-1 # Replace with your desired AWS region
 
-      # Step 5: Deploy using Serverless Framework
+      # Step 5: Create .env file with secrets
+      - name: Create .env file
+        run: |
+          echo "DATABASE_URL=${{ secrets.DB_URL }}" >> .env
+          echo "JWT_SECRET=${{ secrets.JWT_SECRET }}" >> .env
+
+      # Step 6: Deploy using Serverless Framework
       - name: Deploy to AWS Lambda
         run: npx serverless deploy
         env:

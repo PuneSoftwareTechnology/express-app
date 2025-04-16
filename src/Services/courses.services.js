@@ -19,7 +19,6 @@ export const saveCourseService = async (payload) => {
       "modules",
       "prerequisite",
       "related_courses",
-      "category_id",
     ];
     const missingFieldsError = checkMissingFields(payload, requiredFields);
     if (missingFieldsError) return missingFieldsError;
