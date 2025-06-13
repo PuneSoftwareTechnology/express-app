@@ -6,16 +6,18 @@ import {
 } from "../database/dbConnection.js";
 import { checkMissingFields, sendError } from "../utils/helperFunctions.js";
 
+const isValidUUID = (str) => {
+  return (
+    typeof str === "string" &&
+    /^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i.test(
+      str
+    )
+  );
+};
+
 export const createBlogService = async (fields) => {
   try {
-    // Check for required fields
-    const requiredFields = [
-      "title",
-      "slug",
-      "author_id",
-      "featured_image",
-      "conclusion",
-    ];
+    const requiredFields = ["title", "slug"];
     const missingFields = checkMissingFields(fields, requiredFields);
 
     if (missingFields?.length > 0) {
@@ -28,17 +30,28 @@ export const createBlogService = async (fields) => {
       };
     }
 
-    // Convert the array to a JSON string
+    const cleanedFields = { ...fields };
+
+    // 🧹 Remove UUID fields if they are empty strings or invalid
+    const uuidFields = ["category_id", "course_id"]; // NOT author_id
+    uuidFields.forEach((key) => {
+      const value = cleanedFields[key];
+      if (!isValidUUID(value)) {
+        delete cleanedFields[key];
+      }
+    });
+
+    // Convert array field to JSON string
     if (
-      fields.tertiary_content_points &&
-      Array.isArray(fields.tertiary_content_points)
+      cleanedFields.tertiary_content_points &&
+      Array.isArray(cleanedFields.tertiary_content_points)
     ) {
-      fields.tertiary_content_points = JSON.stringify(
-        fields.tertiary_content_points
+      cleanedFields.tertiary_content_points = JSON.stringify(
+        cleanedFields.tertiary_content_points
       );
     }
 
-    await insert("blog_posts", fields);
+    await insert("blog_posts", cleanedFields);
 
     return {
       status: 200,
