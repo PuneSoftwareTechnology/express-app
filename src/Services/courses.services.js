@@ -18,6 +18,7 @@ export const saveCourseService = async (payload) => {
       "module_heading",
       "modules",
       "prerequisite",
+      "meta_desc",
       "related_courses",
     ];
     const missingFieldsError = checkMissingFields(payload, requiredFields);
@@ -530,7 +531,7 @@ export const getCourseDetailsService = async ({ slug }) => {
       "SELECT id,name,description FROM jobs WHERE related_course = $1 AND deleted = false";
     const jobs = await executeRawQuery(jobsQuery, [courseId]);
     const testimonials = await executeRawQuery(
-      "SELECT * FROM testimonials WHERE deleted = false AND course_id = $1",
+      "SELECT * FROM testimonials WHERE deleted = false AND course_id = $1 order by updated_at desc",
       [courseId]
     );
     const blogs = await executeRawQuery(

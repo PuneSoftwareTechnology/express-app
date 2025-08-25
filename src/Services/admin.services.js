@@ -4,7 +4,7 @@ import { findAll, insert, updateSql } from "../database/dbConnection.js";
 import { checkMissingFields, sendError } from "../utils/helperFunctions.js";
 
 const JWT_SECRET = process.env.JWT_SECRET;
-const validRoles = ["ADMIN", "SUPER_ADMIN"];
+const validRoles = ["SUPER_ADMIN", "ENQUIRY_MANAGER", "MARKETING_PERSON"];
 
 export const createAdminUserService = async (fields) => {
   try {
