@@ -455,6 +455,7 @@ export const getCourseDetailsService = async ({ slug }) => {
                                 c1.user_email,
                                 c1.deleted,
                                 c1.category_id,
+                                c1.meta_desc,
                                 COALESCE(
                                     jsonb_agg(
                                         jsonb_build_object(
