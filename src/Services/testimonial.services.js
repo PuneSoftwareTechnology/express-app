@@ -41,6 +41,9 @@ export const getAllTestimonialsService = async (category) => {
 
     query += " ORDER BY updated_at DESC"; // Ensure proper spacing and placement
 
+    if (!category?.backend) {
+      query += " LIMIT 12";
+    }
     const testimonials = await executeRawQuery(query, params);
 
     return {

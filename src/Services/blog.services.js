@@ -81,7 +81,7 @@ export const fetchBlogService = async (landing_page) => {
     const queryOptions = {
       blog: " AND status = 'PUBLISHED' ORDER BY updated_at DESC",
       main: category_id
-        ? ` AND status = 'PUBLISHED' AND category_id = '${category_id}' ORDER BY updated_at DESC`
+        ? ` AND status = 'PUBLISHED' AND category_id = '${category_id}' ORDER BY updated_at DESC LIMIT 4`
         : ` AND status = 'PUBLISHED' AND homepage = true ORDER BY updated_at DESC LIMIT 4`,
     };
 
